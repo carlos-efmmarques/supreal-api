@@ -1,0 +1,364 @@
+name: Example
+description: ''
+endpoints:
+  -
+    httpMethods:
+      - GET
+    uri: api/health
+    metadata:
+      groupName: Example
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Endpoint de teste de saúde da API'
+      description: ''
+      authenticated: false
+      deprecated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: '{"success": true, "message": "API está funcionando", "data": {"status": "healthy", "timestamp": "2025-01-14 10:00:00", "version": "1.0.0"}}'
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - GET
+    uri: api/v1/examples
+    metadata:
+      groupName: Example
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Lista todos os exemplos'
+      description: ''
+      authenticated: false
+      deprecated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters:
+      search:
+        name: search
+        description: 'Filtrar por nome.'
+        required: false
+        example: Item
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      status:
+        name: status
+        description: 'Filtrar por status (active/inactive).'
+        required: false
+        example: active
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+    cleanQueryParameters:
+      search: Item
+      status: active
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: '{"success": true, "message": "Dados recuperados com sucesso", "data": [{"id": 1, "name": "Item 1", "description": "Descrição do item 1", "status": "active"}]}'
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - POST
+    uri: api/v1/examples
+    metadata:
+      groupName: Example
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Cria um novo exemplo'
+      description: ''
+      authenticated: false
+      deprecated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      name:
+        name: name
+        description: 'Nome do item.'
+        required: true
+        example: 'Novo Item'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      description:
+        name: description
+        description: 'Descrição do item.'
+        required: true
+        example: 'Uma descrição detalhada'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      status:
+        name: status
+        description: 'Status do item (active/inactive).'
+        required: false
+        example: active
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        custom: []
+    cleanBodyParameters:
+      name: 'Novo Item'
+      description: 'Uma descrição detalhada'
+      status: active
+    fileParameters: []
+    responses:
+      -
+        status: 201
+        content: '{"success": true, "message": "Item criado com sucesso", "data": {"id": 4, "name": "Novo Item", "description": "Uma descrição detalhada", "status": "active"}}'
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - GET
+    uri: 'api/v1/examples/{id}'
+    metadata:
+      groupName: Example
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Exibe um exemplo específico'
+      description: ''
+      authenticated: false
+      deprecated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        name: id
+        description: 'ID do item.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+    cleanUrlParameters:
+      id: 1
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: '{"success": true, "message": "Item recuperado com sucesso", "data": {"id": 1, "name": "Item 1", "description": "Descrição do item 1", "status": "active"}}'
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 404
+        content: '{"success": false, "message": "Item não encontrado", "data": null}'
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - PUT
+    uri: 'api/v1/examples/{id}'
+    metadata:
+      groupName: Example
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Atualiza um exemplo'
+      description: ''
+      authenticated: false
+      deprecated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        name: id
+        description: 'ID do item.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+    cleanUrlParameters:
+      id: 1
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      name:
+        name: name
+        description: 'Nome do item.'
+        required: false
+        example: 'Item Atualizado'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      description:
+        name: description
+        description: 'Descrição do item.'
+        required: false
+        example: 'Descrição atualizada'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      status:
+        name: status
+        description: 'Status do item (active/inactive).'
+        required: false
+        example: inactive
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+    cleanBodyParameters:
+      name: 'Item Atualizado'
+      description: 'Descrição atualizada'
+      status: inactive
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: '{"success": true, "message": "Item atualizado com sucesso", "data": {"id": 1, "name": "Item Atualizado", "description": "Descrição atualizada", "status": "inactive"}}'
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 404
+        content: '{"success": false, "message": "Item não encontrado", "data": null}'
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - DELETE
+    uri: 'api/v1/examples/{id}'
+    metadata:
+      groupName: Example
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Remove um exemplo'
+      description: ''
+      authenticated: false
+      deprecated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        name: id
+        description: 'ID do item.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+    cleanUrlParameters:
+      id: 1
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: '{"success": true, "message": "Item removido com sucesso", "data": null}'
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 404
+        content: '{"success": false, "message": "Item não encontrado", "data": null}'
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
