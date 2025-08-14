@@ -20,8 +20,9 @@ class DatabaseSeeder extends Seeder
             'email' => 'admin@supreal.com',
         ]);
 
-        // Chamar o seeder de tokens da API
+        // Chamar os seeders
         $this->call([
+            MasterKeySeeder::class, // Deve ser executado primeiro
             ApiTokenSeeder::class,
         ]);
     }

@@ -83,7 +83,7 @@ php artisan migrate
 ```bash
 php artisan db:seed
 ```
-Isso criará tokens de teste que serão exibidos no terminal. **Guarde-os com segurança!**
+Isso criará uma **chave mestra inicial** e tokens de teste que serão exibidos no terminal. **Guarde-os com segurança!**
 
 ### 7. Gere a documentação
 ```bash
@@ -99,15 +99,25 @@ A API estará disponível em `http://localhost:8000`
 
 ## 🔑 Autenticação
 
-Todas as requisições para endpoints protegidos devem incluir um token Bearer no header:
+### Sistema de Segurança em Duas Camadas
 
-```http
-Authorization: Bearer SEU_TOKEN_AQUI
+A API implementa um sistema de segurança robusto com duas camadas:
+
+1. **Chaves Mestras** - Para administradores gerenciarem tokens
+2. **Tokens de API** - Para aplicações acessarem os endpoints
+
+### 1. Chaves Mestras (Administradores)
+
+As chaves mestras são necessárias para **criar, gerenciar e revogar tokens de API**. Apenas administradores devem possuí-las.
+
+#### Criando uma Chave Mestra
+```bash
+php artisan master-key:create "Nome da Chave" --expires="2025-12-31 23:59:59" --created-by="Admin"
 ```
 
-### Gerenciamento de Tokens
+#### Gerenciamento de Tokens (Requer Chave Mestra)
 
-Os tokens podem ser gerenciados através dos endpoints em `/api/tokens`:
+Todos os endpoints de gerenciamento de tokens **requerem** o header `X-Master-Key`:
 
 - **GET /api/tokens** - Lista todos os tokens
 - **POST /api/tokens** - Cria um novo token
@@ -117,18 +127,27 @@ Os tokens podem ser gerenciados através dos endpoints em `/api/tokens`:
 - **POST /api/tokens/{id}/revoke** - Revoga um token
 - **POST /api/tokens/{id}/activate** - Ativa um token
 
-### Criando um Token
+#### Criando um Token de API (Administradores)
 
 ```bash
 curl -X POST http://localhost:8000/api/tokens \
   -H "Content-Type: application/json" \
   -H "Accept: application/json" \
+  -H "X-Master-Key: mk_sua_chave_mestra_aqui" \
   -d '{
     "name": "Sistema X",
     "abilities": ["*"],
     "rate_limit": 100,
     "expires_at": "2025-12-31 23:59:59"
   }'
+```
+
+### 2. Tokens de API (Aplicações)
+
+Todas as requisições para endpoints de dados devem incluir um token Bearer:
+
+```http
+Authorization: Bearer SEU_TOKEN_AQUI
 ```
 
 ### Testando a API

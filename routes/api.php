@@ -15,8 +15,8 @@ use App\Http\Controllers\Api\V1\SiteMercadoController;
 // Rotas públicas
 Route::get('/health', [ExampleController::class, 'health'])->name('api.health');
 
-// Rotas para gerenciamento de tokens (protegidas por autenticação básica ou outro método interno)
-Route::prefix('tokens')->name('api.tokens.')->group(function () {
+// Rotas para gerenciamento de tokens (protegidas por chave mestra)
+Route::prefix('tokens')->middleware(['auth.master'])->name('api.tokens.')->group(function () {
     Route::get('/', [TokenController::class, 'index'])->name('index');
     Route::post('/', [TokenController::class, 'store'])->name('store');
     Route::get('/{id}', [TokenController::class, 'show'])->name('show');

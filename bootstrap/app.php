@@ -5,6 +5,7 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use App\Http\Middleware\AuthenticateApi;
 use App\Http\Middleware\LogApiRequests;
+use App\Http\Middleware\AuthenticateMasterKey;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -17,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'auth.api' => AuthenticateApi::class,
             'log.api' => LogApiRequests::class,
+            'auth.master' => AuthenticateMasterKey::class,
         ]);
 
         $middleware->api(prepend: [
