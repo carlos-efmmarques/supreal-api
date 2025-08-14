@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\TokenController;
 use App\Http\Controllers\Api\V1\ExampleController;
+use App\Http\Controllers\Api\V1\SiteMercadoController;
 
 /*
 |--------------------------------------------------------------------------
@@ -35,6 +36,12 @@ Route::prefix('v1')->middleware(['auth.api'])->name('api.v1.')->group(function (
         Route::get('/{id}', [ExampleController::class, 'show'])->name('show');
         Route::put('/{id}', [ExampleController::class, 'update'])->name('update');
         Route::delete('/{id}', [ExampleController::class, 'destroy'])->name('destroy');
+    });
+    
+    // Site Mercado - APIs para integração com ERP Oracle
+    Route::prefix('site-mercado')->name('site-mercado.')->group(function () {
+        Route::post('/pedidos', [SiteMercadoController::class, 'inserePedido'])->name('pedidos.store');
+        Route::post('/itens', [SiteMercadoController::class, 'insereItens'])->name('itens.store');
     });
     
     // Adicione aqui novos grupos de rotas para outros recursos

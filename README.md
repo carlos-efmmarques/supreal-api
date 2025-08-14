@@ -61,6 +61,19 @@ DB_USERNAME=seu_usuario
 DB_PASSWORD=sua_senha
 ```
 
+### 4.1. Configure o banco Oracle (ERP)
+
+Para as APIs do Site Mercado que se conectam ao ERP Oracle:
+```env
+ORACLE_HOST=10.36.100.101
+ORACLE_PORT=1521
+ORACLE_DATABASE=XE
+ORACLE_USERNAME=seu_usuario_oracle
+ORACLE_PASSWORD=sua_senha_oracle
+ORACLE_CHARSET=AL32UTF8
+ORACLE_PREFIX_SCHEMA=CONSINCO
+```
+
 ### 5. Execute as migrations
 ```bash
 php artisan migrate
@@ -141,6 +154,55 @@ curl -X POST http://localhost:8000/api/v1/examples \
      }'
 ```
 
+## 🏪 APIs do Site Mercado
+
+### Inserir Pedido
+```bash
+curl -X POST http://localhost:8000/api/v1/site-mercado/pedidos \
+     -H "Authorization: Bearer SEU_TOKEN_AQUI" \
+     -H "Content-Type: application/json" \
+     -H "Accept: application/json" \
+     -d '{
+       "nropedidoafv": "PED123456",
+       "nroempresa": 1,
+       "nrocgccpf": "12345678901",
+       "digcgccpf": "23",
+       "nomerazao": "João da Silva",
+       "fisicajuridica": "F",
+       "cidade": "São Paulo",
+       "uf": "SP",
+       "bairro": "Centro",
+       "logradouro": "Rua das Flores",
+       "nrologradouro": "123",
+       "cep": "01234567",
+       "email": "joao@email.com",
+       "indentregaretira": "E",
+       "dtapedidoafv": "2025-01-14",
+       "valor": 150.75,
+       "nroformapagto": 1,
+       "usuinclusao": "API_SITEMERCADO",
+       "nroparcelas": 1
+     }'
+```
+
+### Inserir Itens do Pedido
+```bash
+curl -X POST http://localhost:8000/api/v1/site-mercado/itens \
+     -H "Authorization: Bearer SEU_TOKEN_AQUI" \
+     -H "Content-Type: application/json" \
+     -H "Accept: application/json" \
+     -d '{
+       "nropedidoafv": "PED123456",
+       "seqpedvendaitem": 1,
+       "codacesso": "COD12345",
+       "seqproduto": 12345,
+       "qtdpedida": 2.5,
+       "qtdembalagem": 1.0,
+       "vlrembtabpreco": 15.90,
+       "vlrembinformado": 15.90
+     }'
+```
+
 ## 📚 Documentação da API
 
 A documentação interativa está disponível em:
@@ -158,14 +220,18 @@ app/
 │   │       ├── BaseController.php      # Controller base com ApiResponse trait
 │   │       ├── TokenController.php     # Gerenciamento de tokens
 │   │       └── V1/
-│   │           └── ExampleController.php # Controller de exemplo
+│   │           ├── ExampleController.php # Controller de exemplo
+│   │           └── SiteMercadoController.php # APIs para Site Mercado (Oracle ERP)
 │   ├── Middleware/
 │   │   ├── AuthenticateApi.php        # Middleware de autenticação
 │   │   └── LogApiRequests.php         # Middleware de logging
 │   └── Requests/
 │       ├── CreateTokenRequest.php     # Validação para criação de token
 │       ├── ExampleStoreRequest.php    # Validação de exemplo (POST)
-│       └── ExampleUpdateRequest.php   # Validação de exemplo (PUT)
+│       ├── ExampleUpdateRequest.php   # Validação de exemplo (PUT)
+│       └── SiteMercado/
+│           ├── InserePedidoRequest.php  # Validação para inserção de pedidos
+│           └── InsereItensRequest.php   # Validação para inserção de itens
 ├── Models/
 │   └── ApiToken.php                   # Model de tokens da API
 └── Traits/

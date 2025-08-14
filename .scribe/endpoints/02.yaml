@@ -1,0 +1,541 @@
+name: 'Site Mercado'
+description: ''
+endpoints:
+  -
+    httpMethods:
+      - POST
+    uri: api/v1/site-mercado/pedidos
+    metadata:
+      groupName: 'Site Mercado'
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Insere um pedido no ERP Oracle usando a procedure sp_inserePedidoSitemercado'
+      description: ''
+      authenticated: false
+      deprecated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      nropedidoafv:
+        name: nropedidoafv
+        description: 'Número do pedido AFV.'
+        required: true
+        example: PED123456
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      nroempresa:
+        name: nroempresa
+        description: 'Número da empresa.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      nrocgccpf:
+        name: nrocgccpf
+        description: 'Número do CPF/CNPJ (sem dígito).'
+        required: true
+        example: '12345678901'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      digcgccpf:
+        name: digcgccpf
+        description: 'Dígito verificador do CPF/CNPJ.'
+        required: true
+        example: '23'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      nomerazao:
+        name: nomerazao
+        description: 'Nome ou razão social.'
+        required: true
+        example: 'João da Silva'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      fantasia:
+        name: fantasia
+        description: 'Nome fantasia.'
+        required: false
+        example: 'João da Silva'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        custom: []
+      fisicajuridica:
+        name: fisicajuridica
+        description: 'Tipo de pessoa (F=Física, J=Jurídica).'
+        required: true
+        example: F
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      sexo:
+        name: sexo
+        description: 'Sexo (M/F).'
+        required: false
+        example: M
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        custom: []
+      cidade:
+        name: cidade
+        description: Cidade.
+        required: true
+        example: 'São Paulo'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      uf:
+        name: uf
+        description: UF.
+        required: true
+        example: SP
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      bairro:
+        name: bairro
+        description: Bairro.
+        required: true
+        example: Centro
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      logradouro:
+        name: logradouro
+        description: Logradouro.
+        required: true
+        example: 'Rua das Flores'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      nrologradouro:
+        name: nrologradouro
+        description: 'Número do logradouro.'
+        required: true
+        example: '123'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      cmpltologradouro:
+        name: cmpltologradouro
+        description: Complemento.
+        required: false
+        example: 'Apto 101'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        custom: []
+      cep:
+        name: cep
+        description: CEP.
+        required: true
+        example: '01234567'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      foneddd1:
+        name: foneddd1
+        description: 'DDD do telefone 1.'
+        required: false
+        example: '11'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        custom: []
+      fonenro1:
+        name: fonenro1
+        description: 'Número do telefone 1.'
+        required: false
+        example: '987654321'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        custom: []
+      foneddd2:
+        name: foneddd2
+        description: 'DDD do telefone 2.'
+        required: false
+        example: '11'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        custom: []
+      fonenro2:
+        name: fonenro2
+        description: 'Número do telefone 2.'
+        required: false
+        example: '123456789'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        custom: []
+      inscricaorg:
+        name: inscricaorg
+        description: 'Inscrição RG.'
+        required: false
+        example: '123456789'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        custom: []
+      dtanascfund:
+        name: dtanascfund
+        description: 'Data de nascimento/fundação.'
+        required: false
+        example: '1990-01-01'
+        type: date
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        custom: []
+      email:
+        name: email
+        description: Email.
+        required: true
+        example: joao@email.com
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      emailnfe:
+        name: emailnfe
+        description: 'Email para NFe.'
+        required: false
+        example: joao@email.com
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        custom: []
+      indentregaretira:
+        name: indentregaretira
+        description: 'Indicador entrega/retirada (E=Entrega, R=Retirada).'
+        required: true
+        example: E
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      dtapedidoafv:
+        name: dtapedidoafv
+        description: 'Data do pedido.'
+        required: true
+        example: '2025-01-14'
+        type: date
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      vlrtotfrete:
+        name: vlrtotfrete
+        description: 'Valor total do frete.'
+        required: false
+        example: 15.5
+        type: number
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        custom: []
+      valor:
+        name: valor
+        description: 'Valor total do pedido.'
+        required: true
+        example: 150.75
+        type: number
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      nroformapagto:
+        name: nroformapagto
+        description: 'Forma de pagamento.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      usuinclusao:
+        name: usuinclusao
+        description: 'Usuário de inclusão.'
+        required: true
+        example: API_SITEMERCADO
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      nroparcelas:
+        name: nroparcelas
+        description: 'Número de parcelas.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      codoperadoracartao:
+        name: codoperadoracartao
+        description: 'Código da operadora do cartão.'
+        required: false
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        custom: []
+      nrocartao:
+        name: nrocartao
+        description: 'Número do cartão.'
+        required: false
+        example: '****1234'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        custom: []
+    cleanBodyParameters:
+      nropedidoafv: PED123456
+      nroempresa: 1
+      nrocgccpf: '12345678901'
+      digcgccpf: '23'
+      nomerazao: 'João da Silva'
+      fantasia: 'João da Silva'
+      fisicajuridica: F
+      sexo: M
+      cidade: 'São Paulo'
+      uf: SP
+      bairro: Centro
+      logradouro: 'Rua das Flores'
+      nrologradouro: '123'
+      cmpltologradouro: 'Apto 101'
+      cep: '01234567'
+      foneddd1: '11'
+      fonenro1: '987654321'
+      foneddd2: '11'
+      fonenro2: '123456789'
+      inscricaorg: '123456789'
+      dtanascfund: '1990-01-01'
+      email: joao@email.com
+      emailnfe: joao@email.com
+      indentregaretira: E
+      dtapedidoafv: '2025-01-14'
+      vlrtotfrete: 15.5
+      valor: 150.75
+      nroformapagto: 1
+      usuinclusao: API_SITEMERCADO
+      nroparcelas: 1
+      codoperadoracartao: 1
+      nrocartao: '****1234'
+    fileParameters: []
+    responses:
+      -
+        status: 201
+        content: '{"success": true, "message": "Pedido inserido com sucesso no ERP", "data": {"nropedidoafv": "PED123456"}}'
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 422
+        content: '{"success": false, "message": "Erro de validação", "data": {...}}'
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 500
+        content: '{"success": false, "message": "Erro ao inserir pedido no ERP", "data": {"error": "..."}}'
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - POST
+    uri: api/v1/site-mercado/itens
+    metadata:
+      groupName: 'Site Mercado'
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Insere itens de um pedido no ERP Oracle usando a procedure sp_insereItensSitemercado'
+      description: ''
+      authenticated: false
+      deprecated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      nropedidoafv:
+        name: nropedidoafv
+        description: 'Número do pedido AFV (usado como referência).'
+        required: true
+        example: PED123456
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      seqpedvendaitem:
+        name: seqpedvendaitem
+        description: 'Sequência do item no pedido.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      codacesso:
+        name: codacesso
+        description: 'Código de acesso do produto.'
+        required: true
+        example: COD12345
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      seqproduto:
+        name: seqproduto
+        description: 'Sequência do produto.'
+        required: true
+        example: 12345
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      qtdpedida:
+        name: qtdpedida
+        description: 'Quantidade pedida.'
+        required: true
+        example: 2.5
+        type: number
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      qtdembalagem:
+        name: qtdembalagem
+        description: 'Quantidade da embalagem.'
+        required: true
+        example: 1.0
+        type: number
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      vlrembtabpreco:
+        name: vlrembtabpreco
+        description: 'Valor da embalagem tabela preço.'
+        required: true
+        example: 15.9
+        type: number
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      vlrembinformado:
+        name: vlrembinformado
+        description: 'Valor da embalagem informado.'
+        required: true
+        example: 15.9
+        type: number
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+    cleanBodyParameters:
+      nropedidoafv: PED123456
+      seqpedvendaitem: 1
+      codacesso: COD12345
+      seqproduto: 12345
+      qtdpedida: 2.5
+      qtdembalagem: 1.0
+      vlrembtabpreco: 15.9
+      vlrembinformado: 15.9
+    fileParameters: []
+    responses:
+      -
+        status: 201
+        content: '{"success": true, "message": "Item inserido com sucesso no ERP", "data": {"nropedidoafv": "PED123456", "seqpedvendaitem": 1}}'
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 422
+        content: '{"success": false, "message": "Erro de validação", "data": {...}}'
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 500
+        content: '{"success": false, "message": "Erro ao inserir item no ERP", "data": {"error": "..."}}'
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
