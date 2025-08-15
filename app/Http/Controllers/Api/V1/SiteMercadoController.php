@@ -157,8 +157,30 @@ class SiteMercadoController extends BaseController
             // Remover parâmetros de data do array de bind (já foram inseridos diretamente no SQL)
             unset($bindParams['p_dtanascfund'], $bindParams['p_dtapedidoafv']);
 
-            // Executar usando DB::statement para melhor compatibilidade
-            DB::connection('oracle')->statement($sql, $bindParams);
+            // Usar PDO diretamente para contornar problemas de configuração do Laravel
+            try {
+                $dsn = 'oci:dbname=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=' . env('ORACLE_HOST', '10.36.100.101') . ')(PORT=' . env('ORACLE_PORT', '1521') . '))(CONNECT_DATA=(SERVICE_NAME=' . env('ORACLE_SERVICE_NAME', 'consinco') . ')))';
+                $pdo = new \PDO($dsn, env('ORACLE_USERNAME', 'consinco'), env('ORACLE_PASSWORD', 'consinco'));
+                $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+                $pdo->setAttribute(\PDO::ATTR_AUTOCOMMIT, false); // Desabilitar autocommit
+                
+                $pdo->beginTransaction(); // Iniciar transação
+                
+                $stmt = $pdo->prepare($sql);
+                $stmt->execute($bindParams);
+                
+                $pdo->commit(); // Commit explícito
+                
+                Log::info('SiteMercado: Transação commitada com sucesso', [
+                    'nropedidoafv' => $data['nropedidoafv']
+                ]);
+                
+            } catch (\PDOException $e) {
+                if ($pdo) {
+                    $pdo->rollback(); // Rollback em caso de erro
+                }
+                throw new Exception('Erro PDO Oracle: ' . $e->getMessage());
+            }
 
             Log::info('SiteMercado: Pedido inserido com sucesso', [
                 'nropedidoafv' => $data['nropedidoafv']
