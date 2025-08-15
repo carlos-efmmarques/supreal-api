@@ -36,32 +36,32 @@ IS
 vnseqedipedvenda number;
 BEGIN
 
--- #### ROTINA DE EXCLUSÃO DA SITE MERCADO #######--
- 
-  FOR X IN( SELECT MAX(AA.SEQEDIPEDVENDA) as SEQEDIPEDVENDA 
+-- #### ROTINA DE EXCLUSï¿½O DA SITE MERCADO #######--
+
+  FOR X IN( SELECT MAX(AA.SEQEDIPEDVENDA) as SEQEDIPEDVENDA
             FROM CONSINCO.EDI_PEDVENDA AA
             WHERE AA.NROPEDIDOAFV = p_nropedidoafv
             )
-            
-            LOOP            
+
+            LOOP
 
 DELETE FROM consinco.edi_pedvendaformapagto
  WHERE seqedipedvenda = X.SEQEDIPEDVENDA;
- 
+
 DELETE FROM consinco.edi_pedvendaitem
  WHERE seqedipedvenda = X.SEQEDIPEDVENDA;
- 
-DELETE FROM consinco.edi_pedvenda 
+
+DELETE FROM consinco.edi_pedvenda
 WHERE seqedipedvenda = X.SEQEDIPEDVENDA;
 
 DELETE FROM consinco.edi_pedvendacliente
  WHERE nropedidoafv = p_nropedidoafv;
- 
+
  END LOOP;
- 
- 
- -- ## faz a inserção com o que site mercado envia ## --
- 
+
+
+ -- ## faz a inserï¿½ï¿½o com o que site mercado envia ## --
+
  select consinco.s_edi_pedvenda.nextval
  into vnseqedipedvenda from dual;
 
@@ -114,7 +114,6 @@ p_fonenro1,
 p_foneddd2,
 p_fonenro2,
 p_inscricaorg,
---to_date (p_dtanascfund, 'dd/mm/yyyy'), duplicado estava gerando a data errada
 p_dtanascfund,
 trim(p_email),
 trim(p_emailnfe));
@@ -152,7 +151,7 @@ p_nroempresa,
 p_nroformapagto, -- PASSAR PARA A SITE MERCADO POIS VEM DO INTEGRADOR
 'V',
 'n/a',
-p_usuinclusao, -- PASSAR FIXO ALGUM USUÁRIO OU SOLICITAR QUE A SITE MERCADO PASSE NA CHAMADA
+'OMS-SUPREAL', -- PASSAR FIXO ALGUM USUï¿½RIO OU SOLICITAR QUE A SITE MERCADO PASSE NA CHAMADA
 sysdate,
 p_indentregaretira,
 p_dtapedidoafv,
@@ -161,10 +160,10 @@ p_nroparcelas,
 p_vlrtotfrete,
 'V',
 p_codoperadoracartao,
-374, -- CGO É FIXO - CONFIGURAR
-3,   -- SEGMENT É FIXO - CONFIGURAR
-6);  -- TABELA DE VENDA É FIXA
- 
+894, -- CGO ï¿½ FIXO - FIXO
+2,   -- SEGMENT ï¿½ FIXO - FIXO
+1);  -- TABELA DE VENDA ï¿½ FIXA
+
 INSERT INTO consinco.edi_pedvendaformapagto (
 seqedipedvenda,
 nroformapagto,
@@ -176,13 +175,13 @@ nrocartao,
 nroparcela)
 VALUES (
 vnseqedipedvenda/*p_nropedidoafv*/,
-p_nroformapagto, -- PASSAR PARA A SITE MERCADO POIS VEM DO INTEGRADOR
-NULL, -- INFORMAR A CONDIÇÃO DE PAGAMENTO É FIXO NO PEDIDO
+102, -- FIXO
+102, -- INFORMAR A CONDIï¿½ï¿½O DE PAGAMENTO ï¿½ FIXO NO PEDIDO
 p_valor,
 p_codoperadoracartao,
 NULL,
 p_nrocartao,
-p_nroparcelas);
+1);
 COMMIT;
 END;
 

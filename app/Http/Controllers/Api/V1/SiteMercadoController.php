@@ -13,7 +13,7 @@ use Exception;
 class SiteMercadoController extends BaseController
 {
     /**
-     * Insere um pedido no ERP Oracle usando a procedure sp_inserePedidoSitemercado
+     * Insere um pedido no ERP Oracle usando a procedure SP_INSEREPEDIDOSITEMERCADO
      * 
      * @group Site Mercado
      * @bodyParam nropedidoafv string required Número do pedido AFV. Example: PED123456
@@ -43,8 +43,6 @@ class SiteMercadoController extends BaseController
      * @bodyParam dtapedidoafv date required Data do pedido. Example: 2025-01-14
      * @bodyParam vlrtotfrete number Valor total do frete. Example: 15.50
      * @bodyParam valor number required Valor total do pedido. Example: 150.75
-     * @bodyParam nroformapagto integer required Forma de pagamento. Example: 1
-     * @bodyParam usuinclusao string required Usuário de inclusão. Example: API_SITEMERCADO
      * @bodyParam nroparcelas integer required Número de parcelas. Example: 1
      * @bodyParam codoperadoracartao integer Código da operadora do cartão. Example: 1
      * @bodyParam nrocartao string Número do cartão. Example: ****1234
@@ -57,7 +55,7 @@ class SiteMercadoController extends BaseController
         try {
             $data = $request->validated();
             
-            // Preparar os parâmetros para a procedure
+            // Preparar os parâmetros para a procedure (33 parâmetros conforme assinatura)
             $params = [
                 'p_nropedidoafv' => $data['nropedidoafv'],
                 'p_nroempresa' => $data['nroempresa'],
@@ -86,8 +84,8 @@ class SiteMercadoController extends BaseController
                 'p_dtapedidoafv' => $data['dtapedidoafv'],
                 'p_vlrtotfrete' => $data['vlrtotfrete'] ?? 0,
                 'p_valor' => $data['valor'],
-                'p_nroformapagto' => $data['nroformapagto'],
-                'p_usuinclusao' => $data['usuinclusao'],
+                'p_nroformapagto' => 1, // Valor fixo conforme exemplo fornecido
+                'p_usuinclusao' => 'OMS-SUPREAL', // Valor fixo conforme especificado
                 'p_nroparcelas' => $data['nroparcelas'],
                 'p_codoperadoracartao' => $data['codoperadoracartao'] ?? null,
                 'p_nrocartao' => $data['nrocartao'] ?? null,
@@ -96,14 +94,71 @@ class SiteMercadoController extends BaseController
             // Log da tentativa de inserção
             Log::info('SiteMercado: Tentativa de inserção de pedido', [
                 'nropedidoafv' => $data['nropedidoafv'],
-                'usuario' => $data['usuinclusao']
+                'usuario' => 'OMS-SUPREAL'
             ]);
 
-            // Executar a procedure Oracle
-            DB::connection('oracle')->statement(
-                'CALL consinco.sp_inserePedidoSitemercado(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-                array_values($params)
+            // Executar a procedure Oracle usando o formato do exemplo fornecido
+            $sql = "BEGIN
+                sp_inserePedidoSitemercado(
+                    p_nropedidoafv       => :p_nropedidoafv,
+                    p_nroempresa         => :p_nroempresa,
+                    p_nrocgccpf          => :p_nrocgccpf,
+                    p_digcgccpf          => :p_digcgccpf,
+                    p_nomerazao          => :p_nomerazao,
+                    p_fantasia           => :p_fantasia,
+                    p_fisicajuridica     => :p_fisicajuridica,
+                    p_sexo               => :p_sexo,
+                    p_cidade             => :p_cidade,
+                    p_uf                 => :p_uf,
+                    p_bairro             => :p_bairro,
+                    p_logradouro         => :p_logradouro,
+                    p_nrologradouro      => :p_nrologradouro,
+                    p_cmpltologradouro   => :p_cmpltologradouro,
+                    p_cep                => :p_cep,
+                    p_foneddd1           => :p_foneddd1,
+                    p_fonenro1           => :p_fonenro1,
+                    p_foneddd2           => :p_foneddd2,
+                    p_fonenro2           => :p_fonenro2,
+                    p_inscricaorg        => :p_inscricaorg,
+                    p_dtanascfund        => :p_dtanascfund,
+                    p_email              => :p_email,
+                    p_emailnfe           => :p_emailnfe,
+                    p_indentregaretira   => :p_indentregaretira,
+                    p_dtapedidoafv       => :p_dtapedidoafv,
+                    p_vlrtotfrete        => :p_vlrtotfrete,
+                    p_valor              => :p_valor,
+                    p_nroformapagto      => :p_nroformapagto,
+                    p_usuinclusao        => :p_usuinclusao,
+                    p_nroparcelas        => :p_nroparcelas,
+                    p_codoperadoracartao => :p_codoperadoracartao,
+                    p_nrocartao          => :p_nrocartao
+                );
+            END;";
+
+            // Preparar datas no formato Oracle
+            $bindParams = $params;
+            if (!empty($bindParams['p_dtanascfund'])) {
+                $bindParams['p_dtanascfund'] = date('Y-m-d', strtotime($bindParams['p_dtanascfund']));
+            }
+            if (!empty($bindParams['p_dtapedidoafv'])) {
+                $bindParams['p_dtapedidoafv'] = date('Y-m-d', strtotime($bindParams['p_dtapedidoafv']));
+            }
+
+            // Modificar SQL para usar TO_DATE nas datas
+            $sql = str_replace(
+                [':p_dtanascfund', ':p_dtapedidoafv'],
+                [
+                    !empty($bindParams['p_dtanascfund']) ? "TO_DATE('" . $bindParams['p_dtanascfund'] . "','YYYY-MM-DD')" : 'NULL',
+                    !empty($bindParams['p_dtapedidoafv']) ? "TO_DATE('" . $bindParams['p_dtapedidoafv'] . "','YYYY-MM-DD')" : 'NULL'
+                ],
+                $sql
             );
+
+            // Remover parâmetros de data do array de bind (já foram inseridos diretamente no SQL)
+            unset($bindParams['p_dtanascfund'], $bindParams['p_dtapedidoafv']);
+
+            // Executar usando DB::statement para melhor compatibilidade
+            DB::connection('oracle')->statement($sql, $bindParams);
 
             Log::info('SiteMercado: Pedido inserido com sucesso', [
                 'nropedidoafv' => $data['nropedidoafv']
