@@ -2,7 +2,7 @@
 
 ## Visão Geral
 
-Este documento detalha a implementação da integração com Oracle Database usando PDO diretamente no Laravel para contornar limitações do driver `oci8` com o Query Builder do Laravel. A solução foi desenvolvida para a API do Site Mercado que insere pedidos no ERP Oracle através da procedure `sp_inserePedidoSitemercado`.
+Este documento detalha a implementação da integração com Oracle Database usando PDO diretamente no Laravel para contornar limitações do driver `oci8` com o Query Builder do Laravel. A solução foi desenvolvida para a API do Site Mercado que insere pedidos no ERP Oracle através da procedure `sp_inserePedidoSitemercado`...
 
 ## Problema Identificado
 
