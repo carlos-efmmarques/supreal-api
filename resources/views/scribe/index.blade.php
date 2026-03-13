@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <title>Supreal API - Documentação</title>
+    <title>Supreal API API Documentation</title>
 
     <link href="https://fonts.googleapis.com/css?family=Open+Sans&display=swap" rel="stylesheet">
 
@@ -26,7 +26,7 @@
             </style>
 
     <script>
-        var tryItOutBaseUrl = "http://localhost:8000";
+        var tryItOutBaseUrl = "http://127.0.0.1";
         var useCsrf = Boolean();
         var csrfUrl = "/sanctum/csrf-cookie";
     </script>
@@ -125,7 +125,7 @@
                 </li>
                                     <ul id="tocify-subheader-site-mercado" class="tocify-subheader">
                                                     <li class="tocify-item level-2" data-unique="site-mercado-POSTapi-v1-site-mercado-pedidos">
-                                <a href="#site-mercado-POSTapi-v1-site-mercado-pedidos">Insere um pedido no ERP Oracle usando a procedure sp_inserePedidoSitemercado</a>
+                                <a href="#site-mercado-POSTapi-v1-site-mercado-pedidos">Insere um pedido no ERP Oracle usando a procedure SP_INSEREPEDIDOSITEMERCADO</a>
                             </li>
                                                                                 <li class="tocify-item level-2" data-unique="site-mercado-POSTapi-v1-site-mercado-itens">
                                 <a href="#site-mercado-POSTapi-v1-site-mercado-itens">Insere itens de um pedido no ERP Oracle usando a procedure sp_insereItensSitemercado</a>
@@ -141,7 +141,7 @@
     </ul>
 
     <ul class="toc-footer" id="last-updated">
-        <li>Last updated: August 14, 2025</li>
+        <li>Last updated: March 13, 2026</li>
     </ul>
 </div>
 
@@ -149,33 +149,13 @@
     <div class="dark-box"></div>
     <div class="content">
         <h1 id="introduction">Introduction</h1>
-<p>API interna para comunicação entre sistemas da empresa</p>
 <aside>
-    <strong>Base URL</strong>: <code>http://localhost:8000</code>
+    <strong>Base URL</strong>: <code>http://127.0.0.1</code>
 </aside>
-<pre><code>Esta documentação fornece todas as informações necessárias para trabalhar com nossa API interna.
+<pre><code>This documentation aims to provide all the information you need to work with our API.
 
-## Autenticação
-Todas as requisições para a API devem incluir um token Bearer no header Authorization:
-```
-Authorization: Bearer SEU_TOKEN_AQUI
-```
-
-## Formato de Resposta
-Todas as respostas seguem o padrão:
-```json
-{
-    "success": true|false,
-    "message": "Mensagem descritiva",
-    "data": {}
-}
-```
-
-## Rate Limiting
-Por padrão, cada token tem um limite de 60 requisições por minuto.
-
-&lt;aside&gt;Você verá exemplos de código em diferentes linguagens de programação na área escura à direita (ou como parte do conteúdo no mobile).
-Você pode alternar a linguagem usando as abas no canto superior direito.&lt;/aside&gt;</code></pre>
+&lt;aside&gt;As you scroll, you'll see code examples for working with the API in different programming languages in the dark area to the right (or as part of the content on mobile).
+You can switch the language used with the tabs at the top right (or from the nav menu at the top left on mobile).&lt;/aside&gt;</code></pre>
 
         <h1 id="authenticating-requests">Authenticating requests</h1>
 <p>This API is not authenticated.</p>
@@ -197,14 +177,14 @@ Você pode alternar a linguagem usando as abas no canto superior direito.&lt;/as
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost:8000/api/tokens" \
+    --get "http://127.0.0.1/api/tokens" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost:8000/api/tokens"
+    "http://127.0.0.1/api/tokens"
 );
 
 const headers = {
@@ -221,7 +201,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-tokens">
             <blockquote>
-            <p>Example response (200):</p>
+            <p>Example response (401):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -235,33 +215,9 @@ vary: Origin
  </code></pre></details>         <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;success&quot;: true,
-    &quot;message&quot;: &quot;Tokens listados com sucesso&quot;,
-    &quot;data&quot;: {
-        &quot;items&quot;: [
-            {
-                &quot;id&quot;: 1,
-                &quot;name&quot;: &quot;Token de Teste&quot;,
-                &quot;abilities&quot;: [
-                    &quot;*&quot;
-                ],
-                &quot;last_used_at&quot;: &quot;2025-08-14T20:56:22.000000Z&quot;,
-                &quot;expires_at&quot;: null,
-                &quot;is_active&quot;: true,
-                &quot;created_at&quot;: &quot;2025-08-14T20:56:16.000000Z&quot;
-            }
-        ],
-        &quot;pagination&quot;: {
-            &quot;total&quot;: 1,
-            &quot;per_page&quot;: 20,
-            &quot;current_page&quot;: 1,
-            &quot;last_page&quot;: 1,
-            &quot;from&quot;: 1,
-            &quot;to&quot;: 1,
-            &quot;next_page_url&quot;: null,
-            &quot;prev_page_url&quot;: null
-        }
-    }
+    &quot;success&quot;: false,
+    &quot;message&quot;: &quot;Chave mestra n&atilde;o fornecida. Use o header X-Master-Key.&quot;,
+    &quot;data&quot;: null
 }</code>
  </pre>
     </span>
@@ -349,7 +305,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost:8000/api/tokens" \
+    "http://127.0.0.1/api/tokens" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
     --data "{
@@ -357,7 +313,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
     \"abilities\": [
         \"architecto\"
     ],
-    \"expires_at\": \"2051-09-08\",
+    \"expires_at\": \"2052-04-06\",
     \"ip_restriction\": \"1.102.226.211\",
     \"rate_limit\": 7
 }"
@@ -366,7 +322,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost:8000/api/tokens"
+    "http://127.0.0.1/api/tokens"
 );
 
 const headers = {
@@ -379,7 +335,7 @@ let body = {
     "abilities": [
         "architecto"
     ],
-    "expires_at": "2051-09-08",
+    "expires_at": "2052-04-06",
     "ip_restriction": "1.102.226.211",
     "rate_limit": 7
 };
@@ -494,10 +450,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <i>optional</i> &nbsp;
                 <input type="text" style="display: none"
                               name="expires_at"                data-endpoint="POSTapi-tokens"
-               value="2051-09-08"
+               value="2052-04-06"
                data-component="body">
     <br>
-<p>Must be a valid date. Must be a date after <code>now</code>. Example: <code>2051-09-08</code></p>
+<p>Must be a valid date. Must be a date after <code>now</code>. Example: <code>2052-04-06</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>ip_restriction</code></b>&nbsp;&nbsp;
@@ -547,14 +503,14 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost:8000/api/tokens/architecto" \
+    --get "http://127.0.0.1/api/tokens/architecto" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost:8000/api/tokens/architecto"
+    "http://127.0.0.1/api/tokens/architecto"
 );
 
 const headers = {
@@ -571,7 +527,7 @@ fetch(url, {
 
 <span id="example-responses-GETapi-tokens--id-">
             <blockquote>
-            <p>Example response (404):</p>
+            <p>Example response (401):</p>
         </blockquote>
                 <details class="annotation">
             <summary style="cursor: pointer;">
@@ -586,7 +542,7 @@ vary: Origin
 
 <code class="language-json" style="max-height: 300px;">{
     &quot;success&quot;: false,
-    &quot;message&quot;: &quot;Token n&atilde;o encontrado&quot;,
+    &quot;message&quot;: &quot;Chave mestra n&atilde;o fornecida. Use o header X-Master-Key.&quot;,
     &quot;data&quot;: null
 }</code>
  </pre>
@@ -687,12 +643,12 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
-    "http://localhost:8000/api/tokens/architecto" \
+    "http://127.0.0.1/api/tokens/architecto" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
     --data "{
     \"name\": \"b\",
-    \"expires_at\": \"2051-09-08\",
+    \"expires_at\": \"2052-04-06\",
     \"is_active\": false,
     \"ip_restriction\": \"1.102.226.211\",
     \"rate_limit\": 7
@@ -702,7 +658,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost:8000/api/tokens/architecto"
+    "http://127.0.0.1/api/tokens/architecto"
 );
 
 const headers = {
@@ -712,7 +668,7 @@ const headers = {
 
 let body = {
     "name": "b",
-    "expires_at": "2051-09-08",
+    "expires_at": "2052-04-06",
     "is_active": false,
     "ip_restriction": "1.102.226.211",
     "rate_limit": 7
@@ -838,10 +794,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <i>optional</i> &nbsp;
                 <input type="text" style="display: none"
                               name="expires_at"                data-endpoint="PUTapi-tokens--id-"
-               value="2051-09-08"
+               value="2052-04-06"
                data-component="body">
     <br>
-<p>Must be a valid date. Must be a date after <code>now</code>. Example: <code>2051-09-08</code></p>
+<p>Must be a valid date. Must be a date after <code>now</code>. Example: <code>2052-04-06</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>is_active</code></b>&nbsp;&nbsp;
@@ -912,14 +868,14 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request DELETE \
-    "http://localhost:8000/api/tokens/architecto" \
+    "http://127.0.0.1/api/tokens/architecto" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost:8000/api/tokens/architecto"
+    "http://127.0.0.1/api/tokens/architecto"
 );
 
 const headers = {
@@ -1032,14 +988,14 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost:8000/api/tokens/architecto/revoke" \
+    "http://127.0.0.1/api/tokens/architecto/revoke" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost:8000/api/tokens/architecto/revoke"
+    "http://127.0.0.1/api/tokens/architecto/revoke"
 );
 
 const headers = {
@@ -1152,14 +1108,14 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost:8000/api/tokens/architecto/activate" \
+    "http://127.0.0.1/api/tokens/architecto/activate" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost:8000/api/tokens/architecto/activate"
+    "http://127.0.0.1/api/tokens/architecto/activate"
 );
 
 const headers = {
@@ -1276,14 +1232,14 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost:8000/api/health" \
+    --get "http://127.0.0.1/api/health" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost:8000/api/health"
+    "http://127.0.0.1/api/health"
 );
 
 const headers = {
@@ -1399,14 +1355,14 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost:8000/api/v1/examples?search=Item&amp;status=active" \
+    --get "http://127.0.0.1/api/v1/examples?search=Item&amp;status=active" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost:8000/api/v1/examples"
+    "http://127.0.0.1/api/v1/examples"
 );
 
 const params = {
@@ -1555,7 +1511,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost:8000/api/v1/examples" \
+    "http://127.0.0.1/api/v1/examples" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
     --data "{
@@ -1568,7 +1524,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost:8000/api/v1/examples"
+    "http://127.0.0.1/api/v1/examples"
 );
 
 const headers = {
@@ -1726,14 +1682,14 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost:8000/api/v1/examples/1" \
+    --get "http://127.0.0.1/api/v1/examples/1" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost:8000/api/v1/examples/1"
+    "http://127.0.0.1/api/v1/examples/1"
 );
 
 const headers = {
@@ -1873,7 +1829,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request PUT \
-    "http://localhost:8000/api/v1/examples/1" \
+    "http://127.0.0.1/api/v1/examples/1" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
     --data "{
@@ -1886,7 +1842,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost:8000/api/v1/examples/1"
+    "http://127.0.0.1/api/v1/examples/1"
 );
 
 const headers = {
@@ -2067,14 +2023,14 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request DELETE \
-    "http://localhost:8000/api/v1/examples/1" \
+    "http://127.0.0.1/api/v1/examples/1" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
 
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost:8000/api/v1/examples/1"
+    "http://127.0.0.1/api/v1/examples/1"
 );
 
 const headers = {
@@ -2200,7 +2156,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
     
 
-                                <h2 id="site-mercado-POSTapi-v1-site-mercado-pedidos">Insere um pedido no ERP Oracle usando a procedure sp_inserePedidoSitemercado</h2>
+                                <h2 id="site-mercado-POSTapi-v1-site-mercado-pedidos">Insere um pedido no ERP Oracle usando a procedure SP_INSEREPEDIDOSITEMERCADO</h2>
 
 <p>
 </p>
@@ -2213,7 +2169,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost:8000/api/v1/site-mercado/pedidos" \
+    "http://127.0.0.1/api/v1/site-mercado/pedidos" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
     --data "{
@@ -2244,8 +2200,6 @@ You can check the Dev Tools console for debugging information.</code></pre>
     \"dtapedidoafv\": \"2025-01-14\",
     \"vlrtotfrete\": 15.5,
     \"valor\": 150.75,
-    \"nroformapagto\": 1,
-    \"usuinclusao\": \"API_SITEMERCADO\",
     \"nroparcelas\": 1,
     \"codoperadoracartao\": 1,
     \"nrocartao\": \"****1234\"
@@ -2255,7 +2209,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost:8000/api/v1/site-mercado/pedidos"
+    "http://127.0.0.1/api/v1/site-mercado/pedidos"
 );
 
 const headers = {
@@ -2291,8 +2245,6 @@ let body = {
     "dtapedidoafv": "2025-01-14",
     "vlrtotfrete": 15.5,
     "valor": 150.75,
-    "nroformapagto": 1,
-    "usuinclusao": "API_SITEMERCADO",
     "nroparcelas": 1,
     "codoperadoracartao": 1,
     "nrocartao": "****1234"
@@ -2709,28 +2661,6 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <p>Valor total do pedido. Example: <code>150.75</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
-            <b style="line-height: 2;"><code>nroformapagto</code></b>&nbsp;&nbsp;
-<small>integer</small>&nbsp;
- &nbsp;
-                <input type="number" style="display: none"
-               step="any"               name="nroformapagto"                data-endpoint="POSTapi-v1-site-mercado-pedidos"
-               value="1"
-               data-component="body">
-    <br>
-<p>Forma de pagamento. Example: <code>1</code></p>
-        </div>
-                <div style=" padding-left: 28px;  clear: unset;">
-            <b style="line-height: 2;"><code>usuinclusao</code></b>&nbsp;&nbsp;
-<small>string</small>&nbsp;
- &nbsp;
-                <input type="text" style="display: none"
-                              name="usuinclusao"                data-endpoint="POSTapi-v1-site-mercado-pedidos"
-               value="API_SITEMERCADO"
-               data-component="body">
-    <br>
-<p>Usuário de inclusão. Example: <code>API_SITEMERCADO</code></p>
-        </div>
-                <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>nroparcelas</code></b>&nbsp;&nbsp;
 <small>integer</small>&nbsp;
  &nbsp;
@@ -2778,7 +2708,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://localhost:8000/api/v1/site-mercado/itens" \
+    "http://127.0.0.1/api/v1/site-mercado/itens" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
     --data "{
@@ -2796,7 +2726,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://localhost:8000/api/v1/site-mercado/itens"
+    "http://127.0.0.1/api/v1/site-mercado/itens"
 );
 
 const headers = {
