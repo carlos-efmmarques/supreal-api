@@ -92,8 +92,9 @@ RUN bash -c 'ORACLE_HOME=$(find /opt/oracle -maxdepth 1 -type d -name "instantcl
 # PDO_OCI (necessario para new PDO('oci:...'))
 RUN bash -c 'ORACLE_HOME=$(find /opt/oracle -maxdepth 1 -type d -name "instantclient*" | head -1) \
     && docker-php-ext-configure pdo_oci --with-pdo-oci=instantclient,$ORACLE_HOME \
-    && docker-php-ext-install pdo_oci \
-    && php -m | grep -q pdo_oci'
+    && docker-php-ext-install pdo_oci' \
+    && docker-php-ext-enable pdo_oci \
+    && php -m | grep pdo_oci
 
 ENV ORACLE_HOME=/opt/oracle/instantclient
 ENV LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu:$ORACLE_HOME
