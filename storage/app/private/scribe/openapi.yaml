@@ -1,0 +1,1004 @@
+openapi: 3.0.3
+info:
+  title: 'Supreal API API Documentation'
+  description: ''
+  version: 1.0.0
+servers:
+  -
+    url: 'http://127.0.0.1'
+tags:
+  -
+    name: Endpoints
+    description: ''
+  -
+    name: Example
+    description: ''
+  -
+    name: 'Site Mercado'
+    description: ''
+paths:
+  /api/tokens:
+    get:
+      summary: ''
+      operationId: getApiTokens
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: 'Chave mestra não fornecida. Use o header X-Master-Key.'
+                  data: null
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: 'Chave mestra não fornecida. Use o header X-Master-Key.'
+                  data:
+                    type: string
+                    example: null
+      tags:
+        - Endpoints
+      security: []
+    post:
+      summary: ''
+      operationId: postApiTokens
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: b
+                  nullable: false
+                abilities:
+                  type: array
+                  description: ''
+                  example:
+                    - architecto
+                  items:
+                    type: string
+                expires_at:
+                  type: string
+                  description: 'Must be a valid date. Must be a date after <code>now</code>.'
+                  example: '2052-04-06'
+                  nullable: true
+                ip_restriction:
+                  type: string
+                  description: 'Must be a valid IP address.'
+                  example: 1.102.226.211
+                  nullable: true
+                rate_limit:
+                  type: integer
+                  description: 'Must be at least 1. Must not be greater than 1000.'
+                  example: 7
+                  nullable: true
+                metadata:
+                  type: object
+                  description: ''
+                  example: null
+                  nullable: true
+                  properties: {  }
+              required:
+                - name
+      security: []
+  '/api/tokens/{id}':
+    get:
+      summary: ''
+      operationId: getApiTokensId
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: 'Chave mestra não fornecida. Use o header X-Master-Key.'
+                  data: null
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: 'Chave mestra não fornecida. Use o header X-Master-Key.'
+                  data:
+                    type: string
+                    example: null
+      tags:
+        - Endpoints
+      security: []
+    put:
+      summary: ''
+      operationId: putApiTokensId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: b
+                  nullable: false
+                abilities:
+                  type: object
+                  description: ''
+                  example: null
+                  nullable: false
+                  properties: {  }
+                expires_at:
+                  type: string
+                  description: 'Must be a valid date. Must be a date after <code>now</code>.'
+                  example: '2052-04-06'
+                  nullable: true
+                is_active:
+                  type: boolean
+                  description: ''
+                  example: false
+                  nullable: false
+                ip_restriction:
+                  type: string
+                  description: 'Must be a valid IP address.'
+                  example: 1.102.226.211
+                  nullable: true
+                rate_limit:
+                  type: integer
+                  description: 'Must be at least 1. Must not be greater than 1000.'
+                  example: 7
+                  nullable: false
+                metadata:
+                  type: object
+                  description: ''
+                  example: null
+                  nullable: true
+                  properties: {  }
+      security: []
+    delete:
+      summary: ''
+      operationId: deleteApiTokensId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the token.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  '/api/tokens/{id}/revoke':
+    post:
+      summary: ''
+      operationId: postApiTokensIdRevoke
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the token.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  '/api/tokens/{id}/activate':
+    post:
+      summary: ''
+      operationId: postApiTokensIdActivate
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the token.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  /api/health:
+    get:
+      summary: 'Endpoint de teste de saúde da API'
+      operationId: endpointDeTesteDeSadeDaAPI
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: true
+                  message: 'API está funcionando'
+                  data:
+                    status: healthy
+                    timestamp: '2025-01-14 10:00:00'
+                    version: 1.0.0
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: 'API está funcionando'
+                  data:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                        example: healthy
+                      timestamp:
+                        type: string
+                        example: '2025-01-14 10:00:00'
+                      version:
+                        type: string
+                        example: 1.0.0
+      tags:
+        - Example
+      security: []
+  /api/v1/examples:
+    get:
+      summary: 'Lista todos os exemplos'
+      operationId: listaTodosOsExemplos
+      description: ''
+      parameters:
+        -
+          in: query
+          name: search
+          description: 'Filtrar por nome.'
+          example: Item
+          required: false
+          schema:
+            type: string
+            description: 'Filtrar por nome.'
+            example: Item
+            nullable: false
+        -
+          in: query
+          name: status
+          description: 'Filtrar por status (active/inactive).'
+          example: active
+          required: false
+          schema:
+            type: string
+            description: 'Filtrar por status (active/inactive).'
+            example: active
+            nullable: false
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: true
+                  message: 'Dados recuperados com sucesso'
+                  data:
+                    -
+                      id: 1
+                      name: 'Item 1'
+                      description: 'Descrição do item 1'
+                      status: active
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: 'Dados recuperados com sucesso'
+                  data:
+                    type: array
+                    example:
+                      -
+                        id: 1
+                        name: 'Item 1'
+                        description: 'Descrição do item 1'
+                        status: active
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        name:
+                          type: string
+                          example: 'Item 1'
+                        description:
+                          type: string
+                          example: 'Descrição do item 1'
+                        status:
+                          type: string
+                          example: active
+      tags:
+        - Example
+      security: []
+    post:
+      summary: 'Cria um novo exemplo'
+      operationId: criaUmNovoExemplo
+      description: ''
+      parameters: []
+      responses:
+        201:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: true
+                  message: 'Item criado com sucesso'
+                  data:
+                    id: 4
+                    name: 'Novo Item'
+                    description: 'Uma descrição detalhada'
+                    status: active
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: 'Item criado com sucesso'
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 4
+                      name:
+                        type: string
+                        example: 'Novo Item'
+                      description:
+                        type: string
+                        example: 'Uma descrição detalhada'
+                      status:
+                        type: string
+                        example: active
+      tags:
+        - Example
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 'Nome do item.'
+                  example: 'Novo Item'
+                  nullable: false
+                description:
+                  type: string
+                  description: 'Descrição do item.'
+                  example: 'Uma descrição detalhada'
+                  nullable: false
+                status:
+                  type: string
+                  description: 'Status do item (active/inactive).'
+                  example: active
+                  nullable: true
+              required:
+                - name
+                - description
+      security: []
+  '/api/v1/examples/{id}':
+    get:
+      summary: 'Exibe um exemplo específico'
+      operationId: exibeUmExemploEspecfico
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: true
+                  message: 'Item recuperado com sucesso'
+                  data:
+                    id: 1
+                    name: 'Item 1'
+                    description: 'Descrição do item 1'
+                    status: active
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: 'Item recuperado com sucesso'
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      name:
+                        type: string
+                        example: 'Item 1'
+                      description:
+                        type: string
+                        example: 'Descrição do item 1'
+                      status:
+                        type: string
+                        example: active
+        404:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: 'Item não encontrado'
+                  data: null
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: 'Item não encontrado'
+                  data:
+                    type: string
+                    example: null
+      tags:
+        - Example
+      security: []
+    put:
+      summary: 'Atualiza um exemplo'
+      operationId: atualizaUmExemplo
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: true
+                  message: 'Item atualizado com sucesso'
+                  data:
+                    id: 1
+                    name: 'Item Atualizado'
+                    description: 'Descrição atualizada'
+                    status: inactive
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: 'Item atualizado com sucesso'
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      name:
+                        type: string
+                        example: 'Item Atualizado'
+                      description:
+                        type: string
+                        example: 'Descrição atualizada'
+                      status:
+                        type: string
+                        example: inactive
+        404:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: 'Item não encontrado'
+                  data: null
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: 'Item não encontrado'
+                  data:
+                    type: string
+                    example: null
+      tags:
+        - Example
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 'Nome do item.'
+                  example: 'Item Atualizado'
+                  nullable: false
+                description:
+                  type: string
+                  description: 'Descrição do item.'
+                  example: 'Descrição atualizada'
+                  nullable: false
+                status:
+                  type: string
+                  description: 'Status do item (active/inactive).'
+                  example: inactive
+                  nullable: false
+      security: []
+    delete:
+      summary: 'Remove um exemplo'
+      operationId: removeUmExemplo
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: true
+                  message: 'Item removido com sucesso'
+                  data: null
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: 'Item removido com sucesso'
+                  data:
+                    type: string
+                    example: null
+        404:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: 'Item não encontrado'
+                  data: null
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: 'Item não encontrado'
+                  data:
+                    type: string
+                    example: null
+      tags:
+        - Example
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'ID do item.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  /api/v1/site-mercado/pedidos:
+    post:
+      summary: 'Insere um pedido no ERP Oracle usando a procedure SP_INSEREPEDIDOSITEMERCADO'
+      operationId: insereUmPedidoNoERPOracleUsandoAProcedureSPINSEREPEDIDOSITEMERCADO
+      description: ''
+      parameters: []
+      responses:
+        201:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: true
+                  message: 'Pedido inserido com sucesso no ERP'
+                  data:
+                    nropedidoafv: PED123456
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: 'Pedido inserido com sucesso no ERP'
+                  data:
+                    type: object
+                    properties:
+                      nropedidoafv:
+                        type: string
+                        example: PED123456
+        422:
+          description: ''
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: '{"success": false, "message": "Erro de validação", "data": {...}}'
+        500:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: 'Erro ao inserir pedido no ERP'
+                  data:
+                    error: ...
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: 'Erro ao inserir pedido no ERP'
+                  data:
+                    type: object
+                    properties:
+                      error:
+                        type: string
+                        example: ...
+      tags:
+        - 'Site Mercado'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nropedidoafv:
+                  type: string
+                  description: 'Número do pedido AFV.'
+                  example: PED123456
+                  nullable: false
+                nroempresa:
+                  type: integer
+                  description: 'Número da empresa.'
+                  example: 1
+                  nullable: false
+                nrocgccpf:
+                  type: string
+                  description: 'Número do CPF/CNPJ (sem dígito).'
+                  example: '12345678901'
+                  nullable: false
+                digcgccpf:
+                  type: string
+                  description: 'Dígito verificador do CPF/CNPJ.'
+                  example: '23'
+                  nullable: false
+                nomerazao:
+                  type: string
+                  description: 'Nome ou razão social.'
+                  example: 'João da Silva'
+                  nullable: false
+                fantasia:
+                  type: string
+                  description: 'Nome fantasia.'
+                  example: 'João da Silva'
+                  nullable: true
+                fisicajuridica:
+                  type: string
+                  description: 'Tipo de pessoa (F=Física, J=Jurídica).'
+                  example: F
+                  nullable: false
+                sexo:
+                  type: string
+                  description: 'Sexo (M/F).'
+                  example: M
+                  nullable: true
+                cidade:
+                  type: string
+                  description: Cidade.
+                  example: 'São Paulo'
+                  nullable: false
+                uf:
+                  type: string
+                  description: UF.
+                  example: SP
+                  nullable: false
+                bairro:
+                  type: string
+                  description: Bairro.
+                  example: Centro
+                  nullable: false
+                logradouro:
+                  type: string
+                  description: Logradouro.
+                  example: 'Rua das Flores'
+                  nullable: false
+                nrologradouro:
+                  type: string
+                  description: 'Número do logradouro.'
+                  example: '123'
+                  nullable: false
+                cmpltologradouro:
+                  type: string
+                  description: Complemento.
+                  example: 'Apto 101'
+                  nullable: true
+                cep:
+                  type: string
+                  description: CEP.
+                  example: '01234567'
+                  nullable: false
+                foneddd1:
+                  type: string
+                  description: 'DDD do telefone 1.'
+                  example: '11'
+                  nullable: true
+                fonenro1:
+                  type: string
+                  description: 'Número do telefone 1.'
+                  example: '987654321'
+                  nullable: true
+                foneddd2:
+                  type: string
+                  description: 'DDD do telefone 2.'
+                  example: '11'
+                  nullable: true
+                fonenro2:
+                  type: string
+                  description: 'Número do telefone 2.'
+                  example: '123456789'
+                  nullable: true
+                inscricaorg:
+                  type: string
+                  description: 'Inscrição RG.'
+                  example: '123456789'
+                  nullable: true
+                dtanascfund:
+                  type: date
+                  description: 'Data de nascimento/fundação.'
+                  example: '1990-01-01'
+                  nullable: true
+                email:
+                  type: string
+                  description: Email.
+                  example: joao@email.com
+                  nullable: false
+                emailnfe:
+                  type: string
+                  description: 'Email para NFe.'
+                  example: joao@email.com
+                  nullable: true
+                indentregaretira:
+                  type: string
+                  description: 'Indicador entrega/retirada (E=Entrega, R=Retirada).'
+                  example: E
+                  nullable: false
+                dtapedidoafv:
+                  type: date
+                  description: 'Data do pedido.'
+                  example: '2025-01-14'
+                  nullable: false
+                vlrtotfrete:
+                  type: number
+                  description: 'Valor total do frete.'
+                  example: 15.5
+                  nullable: true
+                valor:
+                  type: number
+                  description: 'Valor total do pedido.'
+                  example: 150.75
+                  nullable: false
+                nroparcelas:
+                  type: integer
+                  description: 'Número de parcelas.'
+                  example: 1
+                  nullable: false
+                codoperadoracartao:
+                  type: integer
+                  description: 'Código da operadora do cartão.'
+                  example: 1
+                  nullable: true
+                nrocartao:
+                  type: string
+                  description: 'Número do cartão.'
+                  example: '****1234'
+                  nullable: true
+              required:
+                - nropedidoafv
+                - nroempresa
+                - nrocgccpf
+                - digcgccpf
+                - nomerazao
+                - fisicajuridica
+                - cidade
+                - uf
+                - bairro
+                - logradouro
+                - nrologradouro
+                - cep
+                - email
+                - indentregaretira
+                - dtapedidoafv
+                - valor
+                - nroparcelas
+      security: []
+  /api/v1/site-mercado/itens:
+    post:
+      summary: 'Insere itens de um pedido no ERP Oracle usando a procedure sp_insereItensSitemercado'
+      operationId: insereItensDeUmPedidoNoERPOracleUsandoAProcedureSpInsereItensSitemercado
+      description: ''
+      parameters: []
+      responses:
+        201:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: true
+                  message: 'Item inserido com sucesso no ERP'
+                  data:
+                    nropedidoafv: PED123456
+                    seqpedvendaitem: 1
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: 'Item inserido com sucesso no ERP'
+                  data:
+                    type: object
+                    properties:
+                      nropedidoafv:
+                        type: string
+                        example: PED123456
+                      seqpedvendaitem:
+                        type: integer
+                        example: 1
+        422:
+          description: ''
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: '{"success": false, "message": "Erro de validação", "data": {...}}'
+        500:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: 'Erro ao inserir item no ERP'
+                  data:
+                    error: ...
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: 'Erro ao inserir item no ERP'
+                  data:
+                    type: object
+                    properties:
+                      error:
+                        type: string
+                        example: ...
+      tags:
+        - 'Site Mercado'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nropedidoafv:
+                  type: string
+                  description: 'Número do pedido AFV (usado como referência).'
+                  example: PED123456
+                  nullable: false
+                seqpedvendaitem:
+                  type: integer
+                  description: 'Sequência do item no pedido.'
+                  example: 1
+                  nullable: false
+                codacesso:
+                  type: string
+                  description: 'Código de acesso do produto.'
+                  example: COD12345
+                  nullable: false
+                seqproduto:
+                  type: integer
+                  description: 'Sequência do produto.'
+                  example: 12345
+                  nullable: false
+                qtdpedida:
+                  type: number
+                  description: 'Quantidade pedida.'
+                  example: 2.5
+                  nullable: false
+                qtdembalagem:
+                  type: number
+                  description: 'Quantidade da embalagem.'
+                  example: 1.0
+                  nullable: false
+                vlrembtabpreco:
+                  type: number
+                  description: 'Valor da embalagem tabela preço.'
+                  example: 15.9
+                  nullable: false
+                vlrembinformado:
+                  type: number
+                  description: 'Valor da embalagem informado.'
+                  example: 15.9
+                  nullable: false
+              required:
+                - nropedidoafv
+                - seqpedvendaitem
+                - codacesso
+                - seqproduto
+                - qtdpedida
+                - qtdembalagem
+                - vlrembtabpreco
+                - vlrembinformado
+      security: []

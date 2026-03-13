@@ -1,0 +1,709 @@
+{
+    "variable": [
+        {
+            "id": "baseUrl",
+            "key": "baseUrl",
+            "type": "string",
+            "name": "string",
+            "value": "http:\/\/127.0.0.1"
+        }
+    ],
+    "info": {
+        "name": "Supreal API API Documentation",
+        "_postman_id": "f44848f3-3c97-499f-872a-a9156c48757c",
+        "description": "",
+        "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
+    },
+    "item": [
+        {
+            "name": "Endpoints",
+            "description": "",
+            "item": [
+                {
+                    "name": "GET api\/tokens",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/tokens",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/tokens"
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "",
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    },
+                    "response": [
+                        {
+                            "header": [
+                                {
+                                    "key": "cache-control",
+                                    "value": "no-cache, private"
+                                },
+                                {
+                                    "key": "content-type",
+                                    "value": "application\/json"
+                                },
+                                {
+                                    "key": "x-ratelimit-limit",
+                                    "value": "60"
+                                },
+                                {
+                                    "key": "x-ratelimit-remaining",
+                                    "value": "59"
+                                },
+                                {
+                                    "key": "vary",
+                                    "value": "Origin"
+                                }
+                            ],
+                            "code": 401,
+                            "body": "{\"success\":false,\"message\":\"Chave mestra n\\u00e3o fornecida. Use o header X-Master-Key.\",\"data\":null}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "POST api\/tokens",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/tokens",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/tokens"
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"name\":\"b\",\"abilities\":[\"architecto\"],\"expires_at\":\"2052-04-06\",\"ip_restriction\":\"1.102.226.211\",\"rate_limit\":7}"
+                        },
+                        "description": "",
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "GET api\/tokens\/{id}",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/tokens\/:id",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/tokens\/:id",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "architecto",
+                                    "description": "The ID of the token."
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "",
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    },
+                    "response": [
+                        {
+                            "header": [
+                                {
+                                    "key": "cache-control",
+                                    "value": "no-cache, private"
+                                },
+                                {
+                                    "key": "content-type",
+                                    "value": "application\/json"
+                                },
+                                {
+                                    "key": "x-ratelimit-limit",
+                                    "value": "60"
+                                },
+                                {
+                                    "key": "x-ratelimit-remaining",
+                                    "value": "59"
+                                },
+                                {
+                                    "key": "vary",
+                                    "value": "Origin"
+                                }
+                            ],
+                            "code": 401,
+                            "body": "{\"success\":false,\"message\":\"Chave mestra n\\u00e3o fornecida. Use o header X-Master-Key.\",\"data\":null}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "PUT api\/tokens\/{id}",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/tokens\/:id",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/tokens\/:id",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "architecto",
+                                    "description": "The ID of the token."
+                                }
+                            ]
+                        },
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"name\":\"b\",\"expires_at\":\"2052-04-06\",\"is_active\":false,\"ip_restriction\":\"1.102.226.211\",\"rate_limit\":7}"
+                        },
+                        "description": "",
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "DELETE api\/tokens\/{id}",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/tokens\/:id",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/tokens\/:id",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "architecto",
+                                    "description": "The ID of the token."
+                                }
+                            ]
+                        },
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "",
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "POST api\/tokens\/{id}\/revoke",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/tokens\/:id\/revoke",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/tokens\/:id\/revoke",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "architecto",
+                                    "description": "The ID of the token."
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "",
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "POST api\/tokens\/{id}\/activate",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/tokens\/:id\/activate",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/tokens\/:id\/activate",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "architecto",
+                                    "description": "The ID of the token."
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "",
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Example",
+            "description": "",
+            "item": [
+                {
+                    "name": "Endpoint de teste de sa\u00fade da API",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/health",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/health"
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "",
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"success\": true, \"message\": \"API est\u00e1 funcionando\", \"data\": {\"status\": \"healthy\", \"timestamp\": \"2025-01-14 10:00:00\", \"version\": \"1.0.0\"}}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Lista todos os exemplos",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/examples",
+                            "query": [
+                                {
+                                    "key": "search",
+                                    "value": "Item",
+                                    "description": "Filtrar por nome.",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "status",
+                                    "value": "active",
+                                    "description": "Filtrar por status (active\/inactive).",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/api\/v1\/examples?search=Item&status=active"
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "",
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"success\": true, \"message\": \"Dados recuperados com sucesso\", \"data\": [{\"id\": 1, \"name\": \"Item 1\", \"description\": \"Descri\u00e7\u00e3o do item 1\", \"status\": \"active\"}]}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Cria um novo exemplo",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/examples",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/examples"
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"name\":\"Novo Item\",\"description\":\"Uma descri\u00e7\u00e3o detalhada\",\"status\":\"active\"}"
+                        },
+                        "description": "",
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 201,
+                            "body": "{\"success\": true, \"message\": \"Item criado com sucesso\", \"data\": {\"id\": 4, \"name\": \"Novo Item\", \"description\": \"Uma descri\u00e7\u00e3o detalhada\", \"status\": \"active\"}}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Exibe um exemplo espec\u00edfico",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/examples\/:id",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/examples\/:id",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "1",
+                                    "description": "ID do item."
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "",
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"success\": true, \"message\": \"Item recuperado com sucesso\", \"data\": {\"id\": 1, \"name\": \"Item 1\", \"description\": \"Descri\u00e7\u00e3o do item 1\", \"status\": \"active\"}}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"success\": false, \"message\": \"Item n\u00e3o encontrado\", \"data\": null}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Atualiza um exemplo",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/examples\/:id",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/examples\/:id",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "1",
+                                    "description": "ID do item."
+                                }
+                            ]
+                        },
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"name\":\"Item Atualizado\",\"description\":\"Descri\u00e7\u00e3o atualizada\",\"status\":\"inactive\"}"
+                        },
+                        "description": "",
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"success\": true, \"message\": \"Item atualizado com sucesso\", \"data\": {\"id\": 1, \"name\": \"Item Atualizado\", \"description\": \"Descri\u00e7\u00e3o atualizada\", \"status\": \"inactive\"}}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"success\": false, \"message\": \"Item n\u00e3o encontrado\", \"data\": null}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Remove um exemplo",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/examples\/:id",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/examples\/:id",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "1",
+                                    "description": "ID do item."
+                                }
+                            ]
+                        },
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "",
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"success\": true, \"message\": \"Item removido com sucesso\", \"data\": null}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"success\": false, \"message\": \"Item n\u00e3o encontrado\", \"data\": null}",
+                            "name": ""
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Site Mercado",
+            "description": "",
+            "item": [
+                {
+                    "name": "Insere um pedido no ERP Oracle usando a procedure SP_INSEREPEDIDOSITEMERCADO",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/site-mercado\/pedidos",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/site-mercado\/pedidos"
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"nropedidoafv\":\"PED123456\",\"nroempresa\":1,\"nrocgccpf\":\"12345678901\",\"digcgccpf\":\"23\",\"nomerazao\":\"Jo\u00e3o da Silva\",\"fantasia\":\"Jo\u00e3o da Silva\",\"fisicajuridica\":\"F\",\"sexo\":\"M\",\"cidade\":\"S\u00e3o Paulo\",\"uf\":\"SP\",\"bairro\":\"Centro\",\"logradouro\":\"Rua das Flores\",\"nrologradouro\":\"123\",\"cmpltologradouro\":\"Apto 101\",\"cep\":\"01234567\",\"foneddd1\":\"11\",\"fonenro1\":\"987654321\",\"foneddd2\":\"11\",\"fonenro2\":\"123456789\",\"inscricaorg\":\"123456789\",\"dtanascfund\":\"1990-01-01\",\"email\":\"joao@email.com\",\"emailnfe\":\"joao@email.com\",\"indentregaretira\":\"E\",\"dtapedidoafv\":\"2025-01-14\",\"vlrtotfrete\":15.5,\"valor\":150.75,\"nroparcelas\":1,\"codoperadoracartao\":1,\"nrocartao\":\"****1234\"}"
+                        },
+                        "description": "",
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 201,
+                            "body": "{\"success\": true, \"message\": \"Pedido inserido com sucesso no ERP\", \"data\": {\"nropedidoafv\": \"PED123456\"}}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 422,
+                            "body": "{\"success\": false, \"message\": \"Erro de valida\u00e7\u00e3o\", \"data\": {...}}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 500,
+                            "body": "{\"success\": false, \"message\": \"Erro ao inserir pedido no ERP\", \"data\": {\"error\": \"...\"}}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Insere itens de um pedido no ERP Oracle usando a procedure sp_insereItensSitemercado",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/site-mercado\/itens",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/site-mercado\/itens"
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"nropedidoafv\":\"PED123456\",\"seqpedvendaitem\":1,\"codacesso\":\"COD12345\",\"seqproduto\":12345,\"qtdpedida\":2.5,\"qtdembalagem\":1,\"vlrembtabpreco\":15.9,\"vlrembinformado\":15.9}"
+                        },
+                        "description": "",
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 201,
+                            "body": "{\"success\": true, \"message\": \"Item inserido com sucesso no ERP\", \"data\": {\"nropedidoafv\": \"PED123456\", \"seqpedvendaitem\": 1}}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 422,
+                            "body": "{\"success\": false, \"message\": \"Erro de valida\u00e7\u00e3o\", \"data\": {...}}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 500,
+                            "body": "{\"success\": false, \"message\": \"Erro ao inserir item no ERP\", \"data\": {\"error\": \"...\"}}",
+                            "name": ""
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "auth": {
+        "type": "noauth"
+    }
+}

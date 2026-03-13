@@ -13,4 +13,6 @@ Route::get('/', function () {
 // Serve Scribe docs without the Scribe package (production)
 if (!class_exists(\Knuckles\Scribe\ScribeServiceProvider::class)) {
     Route::get('/docs', fn () => view('scribe.index'));
+    Route::get('/docs.postman', fn () => response()->file(storage_path('app/private/scribe/collection.json')));
+    Route::get('/docs.openapi', fn () => response()->file(storage_path('app/private/scribe/openapi.yaml')));
 }
