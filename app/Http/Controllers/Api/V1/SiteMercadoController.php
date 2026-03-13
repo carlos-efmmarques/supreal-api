@@ -6,12 +6,20 @@ use App\Http\Controllers\Api\BaseController;
 use App\Http\Requests\SiteMercado\InserePedidoRequest;
 use App\Http\Requests\SiteMercado\InsereItensRequest;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Exception;
 
 class SiteMercadoController extends BaseController
 {
+    private function getOraclePdo(): \PDO
+    {
+        $dsn = 'oci:dbname=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=' . env('ORACLE_HOST', '10.36.100.101') . ')(PORT=' . env('ORACLE_PORT', '1521') . '))(CONNECT_DATA=(SERVICE_NAME=' . env('ORACLE_SERVICE_NAME', 'consinco') . ')))';
+        $pdo = new \PDO($dsn, env('ORACLE_USERNAME', 'consinco'), env('ORACLE_PASSWORD', 'consinco'));
+        $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+        $pdo->setAttribute(\PDO::ATTR_AUTOCOMMIT, false);
+        return $pdo;
+    }
+
     /**
      * Insere um pedido no ERP Oracle usando a procedure SP_INSEREPEDIDOSITEMERCADO
      * 
@@ -158,26 +166,23 @@ class SiteMercadoController extends BaseController
             unset($bindParams['p_dtanascfund'], $bindParams['p_dtapedidoafv']);
 
             // Usar PDO diretamente para contornar problemas de configuração do Laravel
+            $pdo = null;
             try {
-                $dsn = 'oci:dbname=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=' . env('ORACLE_HOST', '10.36.100.101') . ')(PORT=' . env('ORACLE_PORT', '1521') . '))(CONNECT_DATA=(SERVICE_NAME=' . env('ORACLE_SERVICE_NAME', 'consinco') . ')))';
-                $pdo = new \PDO($dsn, env('ORACLE_USERNAME', 'consinco'), env('ORACLE_PASSWORD', 'consinco'));
-                $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-                $pdo->setAttribute(\PDO::ATTR_AUTOCOMMIT, false); // Desabilitar autocommit
-                
-                $pdo->beginTransaction(); // Iniciar transação
-                
+                $pdo = $this->getOraclePdo();
+                $pdo->beginTransaction();
+
                 $stmt = $pdo->prepare($sql);
                 $stmt->execute($bindParams);
-                
-                $pdo->commit(); // Commit explícito
-                
+
+                $pdo->commit();
+
                 Log::info('SiteMercado: Transação commitada com sucesso', [
                     'nropedidoafv' => $data['nropedidoafv']
                 ]);
-                
+
             } catch (\PDOException $e) {
                 if ($pdo) {
-                    $pdo->rollback(); // Rollback em caso de erro
+                    $pdo->rollback();
                 }
                 throw new Exception('Erro PDO Oracle: ' . $e->getMessage());
             }
@@ -241,11 +246,35 @@ class SiteMercadoController extends BaseController
                 'codacesso' => $data['codacesso']
             ]);
 
-            // Executar a procedure Oracle
-            DB::connection('oracle')->statement(
-                'CALL consinco.sp_insereItensSitemercado(?, ?, ?, ?, ?, ?, ?, ?)',
-                array_values($params)
-            );
+            // Executar a procedure Oracle via PDO direto
+            $sql = "BEGIN
+                consinco.sp_insereItensSitemercado(
+                    p_seqedipedvenda   => :p_seqedipedvenda,
+                    p_seqpedvendaitem  => :p_seqpedvendaitem,
+                    p_codacesso        => :p_codacesso,
+                    p_seqproduto       => :p_seqproduto,
+                    p_qtdpedida        => :p_qtdpedida,
+                    p_qtdembalagem     => :p_qtdembalagem,
+                    p_vlrembtabpreco   => :p_vlrembtabpreco,
+                    p_vlrembinformado  => :p_vlrembinformado
+                );
+            END;";
+
+            $pdo = null;
+            try {
+                $pdo = $this->getOraclePdo();
+                $pdo->beginTransaction();
+
+                $stmt = $pdo->prepare($sql);
+                $stmt->execute($params);
+
+                $pdo->commit();
+            } catch (\PDOException $e) {
+                if ($pdo) {
+                    $pdo->rollback();
+                }
+                throw new Exception('Erro PDO Oracle: ' . $e->getMessage());
+            }
 
             Log::info('SiteMercado: Item inserido com sucesso', [
                 'nropedidoafv' => $data['nropedidoafv'],

@@ -1,0 +1,38 @@
+stages:
+- build
+- deploy
+
+build_image:
+  stage: build
+  tags:
+  - deploy
+  variables:
+    DOCKER_BUILDKIT: "1"
+    BUILDKIT_PROGRESS: "plain"
+  script:
+  - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
+  - docker pull "$CI_REGISTRY_IMAGE:main" || echo "Imagem anterior nao encontrada, build sem cache"
+  - >
+    docker build
+    --cache-from "$CI_REGISTRY_IMAGE:main"
+    --build-arg BUILDKIT_INLINE_CACHE=1
+    -t "$CI_REGISTRY_IMAGE:main"
+    -t "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA"
+    .
+  - docker push "$CI_REGISTRY_IMAGE:main"
+  - docker push "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA" || echo "Push da tag commit falhou (nao critico)"
+  only:
+  - main
+
+deploy_production:
+  stage: deploy
+  tags:
+  - deploy
+  script:
+  - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
+  - cd /home/administrator/Docker/supreal-api
+  - cp "$CI_PROJECT_DIR/docker/docker-compose.production.yml" ./docker-compose.yml
+  - docker compose pull
+  - docker compose up -d
+  only:
+  - main

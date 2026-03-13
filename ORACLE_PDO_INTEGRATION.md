@@ -2,237 +2,209 @@
 
 ## Visão Geral
 
-Este documento detalha a implementação da integração com Oracle Database usando PDO diretamente no Laravel para contornar limitações do driver `oci8` com o Query Builder do Laravel. A solução foi desenvolvida para a API do Site Mercado que insere pedidos no ERP Oracle através da procedure `sp_inserePedidoSitemercado`.
+Este documento detalha a integração com Oracle Database usando PDO diretamente no Laravel para inserção de pedidos do site (supermercadosreal.delivery) no ERP Oracle através da API supreal-api. O fluxo completo envolve buscar pedidos do site, mapear os dados e enviar via API para as procedures Oracle `sp_inserePedidoSitemercado` e `sp_insereItensSitemercado`.
 
-## Problema Identificado
+## Arquitetura do Fluxo
 
-### Erro Inicial
 ```
-"Unsupported driver [oci8]"
+Site (supermercadosreal.delivery)
+    │
+    ▼ GET /api/pedido/{id}/v2/
+OMS (supreal-oms) - Agente de Vendas Central
+    │
+    ▼ POST /api/v1/site-mercado/pedidos + /itens
+Supreal API (supreal-api.test / Docker)
+    │
+    ▼ PDO direto (oci:dbname=...)
+Oracle ERP (consinco)
+    │
+    ├── edi_pedvendacliente  (dados do pedido/cliente)
+    ├── edi_pedvendaitem     (itens do pedido)
+    │       ▼ (procedure interna do ERP)
+    ├── mad_pedvenda         (pedido de venda gerado)
+    └── mad_pedvendaitem     (itens do pedido de venda)
 ```
 
-### Causa Raiz
-- O Laravel não conseguia reconhecer o driver `oci8` através do sistema de conexões padrão
-- O `DB::connection('oracle')` falhava mesmo com as extensões PHP corretas instaladas
-- Necessidade de controle manual de transações para garantir commit dos dados
+## Extensões PHP Necessárias
 
-### Extensões PHP Disponíveis
 ```bash
 $ php -m | grep -i oci
-oci8
-PDO_OCI
+oci8       # Extensão nativa Oracle
+PDO_OCI    # Driver PDO para Oracle (CRÍTICO - deve estar habilitado)
 ```
+
+**IMPORTANTE:** A extensão `pdo_oci` deve estar habilitada no php.ini. No Laragon (Windows), verificar em `C:/laragon/bin/php/php-X.X.X/php.ini`:
+```ini
+extension=pdo_oci   ; Descomentar esta linha (remover o ;)
+```
+Reiniciar o Apache após a alteração.
 
 ## Solução Implementada
 
-### 1. Configuração Oracle no Laravel
-
-**Arquivo:** `config/database.php`
-
-```php
-'oracle' => [
-    'driver' => 'oci8',
-    'tns' => env('ORACLE_TNS', 'consinco'),
-    'host' => env('ORACLE_HOST', '10.36.100.101'),
-    'port' => env('ORACLE_PORT', '1521'),
-    'database' => env('ORACLE_DATABASE', 'consinco'),
-    'service_name' => env('ORACLE_SERVICE_NAME', 'consinco'),
-    'username' => env('ORACLE_USERNAME', 'consinco'),
-    'password' => env('ORACLE_PASSWORD', 'consinco'),
-    'charset' => env('ORACLE_CHARSET', 'AL32UTF8'),
-],
-```
-
-### 2. Implementação PDO Direta
+### 1. Método Helper para Conexão PDO
 
 **Arquivo:** `app/Http/Controllers/Api/V1/SiteMercadoController.php`
 
+Conexão PDO centralizada em método reutilizável (ambos os endpoints usam):
+
 ```php
-// Usar PDO diretamente para contornar problemas de configuração do Laravel
-try {
-    $dsn = 'oci:dbname=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=' . env('ORACLE_HOST', '10.36.100.101') . ')(PORT=' . env('ORACLE_PORT', '1521') . '))(CONNECT_DATA=(SERVICE_NAME=' . env('ORACLE_SERVICE_NAME', 'consinco') . ')))';
+private function getOraclePdo(): \PDO
+{
+    $dsn = 'oci:dbname=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST='
+        . env('ORACLE_HOST', '10.36.100.101')
+        . ')(PORT=' . env('ORACLE_PORT', '1521')
+        . '))(CONNECT_DATA=(SERVICE_NAME='
+        . env('ORACLE_SERVICE_NAME', 'consinco') . ')))';
     $pdo = new \PDO($dsn, env('ORACLE_USERNAME', 'consinco'), env('ORACLE_PASSWORD', 'consinco'));
     $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-    $pdo->setAttribute(\PDO::ATTR_AUTOCOMMIT, false); // Desabilitar autocommit
-    
-    $pdo->beginTransaction(); // Iniciar transação
-    
+    $pdo->setAttribute(\PDO::ATTR_AUTOCOMMIT, false);
+    return $pdo;
+}
+```
+
+### 2. Inserção de Pedido (inserePedido)
+
+Usa a procedure `sp_inserePedidoSitemercado` com parâmetros nomeados e tratamento de datas via `TO_DATE()`:
+
+```php
+$pdo = null;
+try {
+    $pdo = $this->getOraclePdo();
+    $pdo->beginTransaction();
     $stmt = $pdo->prepare($sql);
     $stmt->execute($bindParams);
-    
-    $pdo->commit(); // Commit explícito
-    
-    Log::info('SiteMercado: Transação commitada com sucesso', [
-        'nropedidoafv' => $data['nropedidoafv']
-    ]);
-    
+    $pdo->commit();
 } catch (\PDOException $e) {
-    if ($pdo) {
-        $pdo->rollback(); // Rollback em caso de erro
-    }
+    if ($pdo) { $pdo->rollback(); }
     throw new Exception('Erro PDO Oracle: ' . $e->getMessage());
 }
 ```
 
-### 3. Construção do SQL com Parâmetros Nomeados
+### 3. Inserção de Itens (insereItens)
+
+Usa a procedure `consinco.sp_insereItensSitemercado` com o mesmo padrão PDO direto:
 
 ```php
 $sql = "BEGIN
-    sp_inserePedidoSitemercado(
-        p_nropedidoafv       => :p_nropedidoafv,
-        p_nroempresa         => :p_nroempresa,
-        p_nrocgccpf          => :p_nrocgccpf,
-        p_digcgccpf          => :p_digcgccpf,
-        p_nomerazao          => :p_nomerazao,
-        p_fantasia           => :p_fantasia,
-        p_fisicajuridica     => :p_fisicajuridica,
-        p_sexo               => :p_sexo,
-        p_cidade             => :p_cidade,
-        p_uf                 => :p_uf,
-        p_bairro             => :p_bairro,
-        p_logradouro         => :p_logradouro,
-        p_nrologradouro      => :p_nrologradouro,
-        p_cmpltologradouro   => :p_cmpltologradouro,
-        p_cep                => :p_cep,
-        p_foneddd1           => :p_foneddd1,
-        p_fonenro1           => :p_fonenro1,
-        p_foneddd2           => :p_foneddd2,
-        p_fonenro2           => :p_fonenro2,
-        p_inscricaorg        => :p_inscricaorg,
-        p_dtanascfund        => :p_dtanascfund,
-        p_email              => :p_email,
-        p_emailnfe           => :p_emailnfe,
-        p_indentregaretira   => :p_indentregaretira,
-        p_dtapedidoafv       => :p_dtapedidoafv,
-        p_vlrtotfrete        => :p_vlrtotfrete,
-        p_valor              => :p_valor,
-        p_nroformapagto      => :p_nroformapagto,
-        p_usuinclusao        => :p_usuinclusao,
-        p_nroparcelas        => :p_nroparcelas,
-        p_codoperadoracartao => :p_codoperadoracartao,
-        p_nrocartao          => :p_nrocartao
+    consinco.sp_insereItensSitemercado(
+        p_seqedipedvenda   => :p_seqedipedvenda,
+        p_seqpedvendaitem  => :p_seqpedvendaitem,
+        p_codacesso        => :p_codacesso,
+        p_seqproduto       => :p_seqproduto,
+        p_qtdpedida        => :p_qtdpedida,
+        p_qtdembalagem     => :p_qtdembalagem,
+        p_vlrembtabpreco   => :p_vlrembtabpreco,
+        p_vlrembinformado  => :p_vlrembinformado
     );
 END;";
 ```
 
-### 4. Tratamento de Datas Oracle
+**IMPORTANTE:** O método `insereItens` originalmente usava `DB::connection('oracle')` que falhava com "Unsupported driver [oci8]". Foi migrado para PDO direto (mesmo padrão do `inserePedido`).
 
-```php
-// Preparar datas no formato Oracle
-$bindParams = $params;
-if (!empty($bindParams['p_dtanascfund'])) {
-    $bindParams['p_dtanascfund'] = date('Y-m-d', strtotime($bindParams['p_dtanascfund']));
-}
-if (!empty($bindParams['p_dtapedidoafv'])) {
-    $bindParams['p_dtapedidoafv'] = date('Y-m-d', strtotime($bindParams['p_dtapedidoafv']));
-}
+## Mapeamento de Dados: Site → API
 
-// Modificar SQL para usar TO_DATE nas datas
-$sql = str_replace(
-    [':p_dtanascfund', ':p_dtapedidoafv'],
-    [
-        !empty($bindParams['p_dtanascfund']) ? "TO_DATE('" . $bindParams['p_dtanascfund'] . "','YYYY-MM-DD')" : 'NULL',
-        !empty($bindParams['p_dtapedidoafv']) ? "TO_DATE('" . $bindParams['p_dtapedidoafv'] . "','YYYY-MM-DD')" : 'NULL'
-    ],
-    $sql
-);
+### Pedido (POST /api/v1/site-mercado/pedidos)
 
-// Remover parâmetros de data do array de bind (já foram inseridos diretamente no SQL)
-unset($bindParams['p_dtanascfund'], $bindParams['p_dtapedidoafv']);
+| Campo API | Origem (site order) | Notas |
+|---|---|---|
+| `nropedidoafv` | `order['id']` (string) | ID do pedido no site |
+| `nroempresa` | Número da loja destino | Ex: 3 = Noronha, 4 = outra loja |
+| `nrocgccpf` | `order['user']['cpf']` | Somente dígitos, SEM os 2 últimos |
+| `digcgccpf` | `order['user']['cpf']` | Últimos 2 dígitos |
+| `nomerazao` | `order['user']['name']` | Nome completo |
+| `fantasia` | `order['user']['name']` | **MAX 30 caracteres** - truncar! |
+| `fisicajuridica` | `"F"` | F=Física (padrão site) |
+| `sexo` | `order['user']['sexo']` | "F" ou "M" (primeira letra maiúscula) |
+| `cidade` | `order['endereco_entrega']['cidade']` | Sem acentos recomendado |
+| `uf` | Derivado da cidade | "RJ" para Niterói |
+| `bairro` | `order['endereco_entrega']['bairro']` | |
+| `logradouro` | `order['endereco_entrega']['rua']` | |
+| `nrologradouro` | `order['endereco_entrega']['numero']` | |
+| `cmpltologradouro` | `order['endereco_entrega']['complemento']` | |
+| `cep` | `order['endereco_entrega']['cep']` | Somente dígitos, sem hífen |
+| `foneddd1` | `order['user']['telefone']` | Primeiros 2 dígitos |
+| `fonenro1` | `order['user']['telefone']` | Restante sem DDD |
+| `email` | `order['user']['email']` | |
+| `emailnfe` | `order['user']['email']` | Mesmo que email |
+| `indentregaretira` | `"E"` | E=Entrega |
+| `dtapedidoafv` | `order['data_agendamento']` | Data de agendamento (YYYY-MM-DD) |
+| `vlrtotfrete` | `order['valor_frete']` | |
+| `valor` | `order['valor_total_final']` | Valor total com frete |
+| `nroformapagto` | `1` | Fixo na procedure |
+| `usuinclusao` | `"OMS-SUPREAL"` | Fixo na procedure |
+| `nroparcelas` | `1` | |
+| `codoperadoracartao` | `1` | |
+
+### Itens (POST /api/v1/site-mercado/itens)
+
+| Campo API | Origem (site order item) | Notas |
+|---|---|---|
+| `nropedidoafv` | Mesmo ID do pedido | |
+| `seqpedvendaitem` | Índice do item (1, 2, 3...) | Sequencial começando em 1 |
+| `codacesso` | `item['codigo']` | Código do produto no site |
+| `seqproduto` | `item['codigo']` (int) | Mesmo código como inteiro |
+| `qtdpedida` | `item['quantidade']` | Pode ser decimal (ex: 0.5 para 500g) |
+| `qtdembalagem` | `1` | Fixo |
+| `vlrembtabpreco` | `item['subtotal']` | Valor com desconto de fração |
+| `vlrembinformado` | `item['subtotal']` | Mesmo que tabela |
+
+### Exemplo: Tratamento do CPF
+
+CPF do site: `"145.847.877-78"` ou `"010.238.807-50"`
+
+```
+Limpar: "14584787778"
+nrocgccpf: "145847877"    (todos menos últimos 2)
+digcgccpf: "78"           (últimos 2 dígitos)
 ```
 
-## Exemplo de Uso da API
+### Exemplo: Tratamento do Telefone
 
-### Endpoint
+Telefone do site: `"21997590470"`
+
 ```
-POST /api/v1/site-mercado/pedidos
+foneddd1: "21"         (primeiros 2 dígitos)
+fonenro1: "997590470"  (restante)
 ```
 
-### Headers de Autenticação
+## Endpoints da API
+
+### Autenticação
+
 ```http
-Content-Type: application/json
-X-Master-Key: mk_v63ElDoJR1JJ8r3Ei6yxdba4skBVYEigeKekniBNzrYmZ1XA3VK72nkn3vDf
-Authorization: Bearer dev-token-37db0e7e3067c3c4fe5742287314d1ce17ed2cca
+X-Master-Key: {master_key}
+Authorization: Bearer {token}
 ```
 
-### Payload de Exemplo
-```json
-{
-    "nropedidoafv": "1002",
-    "nroempresa": 1,
-    "nrocgccpf": "12345678901",
-    "digcgccpf": "00",
-    "nomerazao": "José da Silva",
-    "fantasia": "José Silva",
-    "fisicajuridica": "F",
-    "sexo": "M",
-    "cidade": "Campinas",
-    "uf": "SP",
-    "bairro": "Centro",
-    "logradouro": "Rua das Flores",
-    "nrologradouro": "123",
-    "cmpltologradouro": "Apto 12",
-    "cep": "13010000",
-    "foneddd1": "19",
-    "fonenro1": "999999999",
-    "dtanascfund": "1985-03-25",
-    "email": "jose.silva@email.com",
-    "emailnfe": "nfe@email.com",
-    "indentregaretira": "E",
-    "dtapedidoafv": "2025-08-15",
-    "vlrtotfrete": 15.75,
-    "valor": 250.90,
-    "nroparcelas": 2,
-    "codoperadoracartao": 101
-}
+Para gerar um novo token:
+```bash
+curl -sk https://supreal-api.test/api/tokens \
+  -X POST \
+  -H "Content-Type: application/json" \
+  -H "X-Master-Key: {master_key}" \
+  -d '{"name": "Token OMS", "abilities": ["*"], "rate_limit": 1000}'
 ```
 
-### Resposta de Sucesso
-```json
-{
-    "success": true,
-    "message": "Pedido inserido com sucesso no ERP",
-    "data": {
-        "nropedidoafv": "1002"
-    }
-}
-```
-
-## Comando cURL Completo
+### Inserir Pedido
 
 ```bash
-curl -X POST http://localhost:8000/api/v1/site-mercado/pedidos \
--H "Content-Type: application/json" \
--H "X-Master-Key: mk_v63ElDoJR1JJ8r3Ei6yxdba4skBVYEigeKekniBNzrYmZ1XA3VK72nkn3vDf" \
--H "Authorization: Bearer dev-token-37db0e7e3067c3c4fe5742287314d1ce17ed2cca" \
--d '{
-    "nropedidoafv": "1002",
-    "nroempresa": 1,
-    "nrocgccpf": "12345678901",
-    "digcgccpf": "00",
-    "nomerazao": "José da Silva",
-    "fantasia": "José Silva",
-    "fisicajuridica": "F",
-    "sexo": "M",
-    "cidade": "Campinas",
-    "uf": "SP",
-    "bairro": "Centro",
-    "logradouro": "Rua das Flores",
-    "nrologradouro": "123",
-    "cmpltologradouro": "Apto 12",
-    "cep": "13010000",
-    "foneddd1": "19",
-    "fonenro1": "999999999",
-    "dtanascfund": "1985-03-25",
-    "email": "jose.silva@email.com",
-    "emailnfe": "nfe@email.com",
-    "indentregaretira": "E",
-    "dtapedidoafv": "2025-08-15",
-    "vlrtotfrete": 15.75,
-    "valor": 250.90,
-    "nroparcelas": 2,
-    "codoperadoracartao": 101
-}'
+curl -sk https://supreal-api.test/api/v1/site-mercado/pedidos \
+  -X POST \
+  -H "Content-Type: application/json" \
+  -H "X-Master-Key: {master_key}" \
+  -H "Authorization: Bearer {token}" \
+  -d @pedido.json
+```
+
+### Inserir Item
+
+```bash
+curl -sk https://supreal-api.test/api/v1/site-mercado/itens \
+  -X POST \
+  -H "Content-Type: application/json" \
+  -H "X-Master-Key: {master_key}" \
+  -H "Authorization: Bearer {token}" \
+  -d @item.json
 ```
 
 ## Verificação no Banco de Dados
@@ -240,102 +212,140 @@ curl -X POST http://localhost:8000/api/v1/site-mercado/pedidos \
 ### Consultas para Verificar Inserção
 
 ```sql
--- Consulta por nome (com schema explícito)
-SELECT * FROM consinco.edi_pedvendacliente WHERE nomerazao = 'José da Silva';
+-- Verificar pedido na tabela EDI (dados brutos recebidos pela API)
+SELECT * FROM consinco.edi_pedvendacliente WHERE nropedidoafv = '5369';
 
--- Consulta por número do pedido
-SELECT * FROM consinco.edi_pedvendacliente WHERE nropedidoafv IN ('1001', '1002');
+-- Verificar itens na tabela EDI
+SELECT * FROM consinco.edi_pedvendaitem ei WHERE ei.seqedipedvenda = '{seqedipedvenda}';
 
--- Consulta dos registros mais recentes
-SELECT * FROM consinco.edi_pedvendacliente ORDER BY rowid DESC FETCH FIRST 10 ROWS ONLY;
+-- Verificar pedido de venda gerado pelo ERP (após processamento EDI)
+SELECT * FROM consinco.mad_pedvenda mp WHERE mp.nropedvenda = {nropedvenda};
+
+-- Verificar itens do pedido de venda
+SELECT * FROM consinco.mad_pedvendaitem mp WHERE mp.nropedvenda = {nropedvenda};
+
+-- Encontrar o nropedvenda a partir do nropedidoafv
+SELECT * FROM consinco.edi_pedvenda ep WHERE ep.nropedidoafv = '5369';
 ```
 
-## Componentes da Solução
+### Diagnóstico: Itens na EDI que Não Foram para o Pedido de Venda
 
-### 1. Request Validation
-- **Arquivo:** `app/Http/Requests/SiteMercado/InserePedidoRequest.php`
-- Validação completa de todos os 32 parâmetros da procedure
-- Mensagens de erro customizadas em português
-- Validação de tipos, formatos e regras de negócio
+```sql
+-- Itens inseridos via API que o ERP descartou ao processar
+SELECT ei.seqpedvendaitem, ei.seqproduto, ei.codacesso
+FROM consinco.edi_pedvendaitem ei
+WHERE ei.seqedipedvenda = '{seqedipedvenda}'
+AND ei.seqproduto NOT IN (
+    SELECT mp.seqproduto FROM consinco.mad_pedvendaitem mp WHERE mp.nropedvenda = {nropedvenda}
+);
 
-### 2. Controller
-- **Arquivo:** `app/Http/Controllers/Api/V1/SiteMercadoController.php`
-- Método: `inserePedido(InserePedidoRequest $request)`
-- Implementação PDO direta com controle de transação
-- Logs detalhados para auditoria
+-- Verificar se produtos existem no cadastro
+SELECT p.seqproduto, p.descricao
+FROM consinco.map_produto p
+WHERE p.seqproduto IN ({lista_de_codigos});
+```
 
-### 3. Middleware de Autenticação
-- Autenticação via Master Key (X-Master-Key header)
-- Autenticação via Developer Token (Authorization Bearer header)
-- Sistema de segurança em duas camadas
+## Problemas Conhecidos e Soluções
 
-## Pontos Críticos da Implementação
+### 1. "Unsupported driver [oci8]"
+**Causa:** `DB::connection('oracle')` não funciona sem o pacote `yajra/laravel-oci8` corretamente configurado.
+**Solução:** Usar PDO direto via `getOraclePdo()` em vez do Query Builder do Laravel.
 
-### 1. Controle de Transação
+### 2. "could not find driver"
+**Causa:** Extensão `pdo_oci` não habilitada no PHP do servidor web.
+**Solução:** Descomentar `extension=pdo_oci` no php.ini e reiniciar o servidor.
+
+### 3. "Undefined variable $pdo" no catch
+**Causa:** Se a conexão PDO falhar na criação, a variável `$pdo` não existe no bloco catch.
+**Solução:** Inicializar `$pdo = null;` antes do bloco try.
+
+### 4. Dados não aparecem no banco após inserção
+**Causa:** Oracle requer commit explícito.
+**Solução:** `$pdo->setAttribute(\PDO::ATTR_AUTOCOMMIT, false)` + `$pdo->beginTransaction()` + `$pdo->commit()`.
+
+### 5. Campo FANTASIA excede limite
+**Causa:** Coluna `FANTASIA` na tabela `EDI_PEDVENDACLIENTE` tem máximo de 30 caracteres.
+**Solução:** Truncar o campo `fantasia` para 30 caracteres antes de enviar: `substr($nome, 0, 30)`.
+
+### 6. Itens inseridos na EDI mas não aparecem no pedido de venda
+**Causa:** O ERP processa os itens da `edi_pedvendaitem` para `mad_pedvendaitem` e pode descartar itens cujo `seqproduto` não corresponde a um produto válido/ativo no cadastro daquela empresa, ou por regras internas de segmento/tabela de preço.
+**Diagnóstico:** Comparar contagem de itens entre `edi_pedvendaitem` e `mad_pedvendaitem`. Os itens descartados foram inseridos com sucesso na EDI (API retorna sucesso) mas o ERP os filtra silenciosamente durante o processamento.
+**Nota:** Este é um comportamento do ERP, não da API. A API insere corretamente em `edi_pedvendaitem`.
+
+### 7. Segmento do pedido
+**Causa:** O segmento do pedido de venda é definido internamente pela procedure `sp_inserePedidoSitemercado`, não é um parâmetro da API.
+**Solução:** Alterar diretamente na procedure Oracle no banco consinco.
+
+## Testes Realizados (2026-03-13)
+
+### Pedido 5371 (7 itens - pedido simples)
+- **Cliente:** Ana Carolina Conceição Neves (CPF 145.847.877-78)
+- **Empresa:** 4 (Niterói)
+- **Resultado:** Pedido + 7 itens inseridos com sucesso
+- **Valor:** R$ 56,93
+
+### Pedido 5369 (58 itens - pedido grande)
+- **Cliente:** Teresa Cristina Lopes de Amorim (CPF 010.238.807-50)
+- **Empresa:** 3 (Noronha)
+- **Resultado API:** 58/58 itens inseridos com sucesso na EDI
+- **Resultado ERP:** 45/58 itens no pedido de venda (13 descartados pelo ERP)
+- **Valor:** R$ 678,16
+- **Problema encontrado:** Campo `fantasia` excedia 30 caracteres (31 chars no nome) - resolvido com truncamento
+- **Investigação:** Itens descartados existem na `edi_pedvendaitem` e na `map_produto`, mas o ERP não os transferiu para `mad_pedvendaitem` - comportamento interno do processamento EDI
+
+## Docker
+
+A API é containerizada com Docker para rodar internamente. Estrutura:
+
+```
+supreal-api/
+├── Dockerfile                    # PHP 8.2-FPM + Oracle (oci8 + pdo_oci)
+├── .gitlab-ci.yml                # Pipeline: build → deploy
+├── docker/
+│   ├── oracle/                   # Instant Client 21 (basic + sdk + oci8.tgz)
+│   ├── nginx/                    # Configuração nginx
+│   ├── supervisor/               # PHP-FPM + Nginx + Queue worker
+│   ├── start.sh                  # Script de inicialização
+│   └── docker-compose.production.yml
+```
+
+**CRÍTICO para Docker:** O Dockerfile instala tanto `oci8` quanto `pdo_oci`:
+```dockerfile
+# OCI8 (via pecl)
+RUN echo "instantclient,$ORACLE_HOME" | pecl install /tmp/oracle/oci8-3.3.0.tgz
+
+# PDO_OCI (via docker-php-ext)
+RUN docker-php-ext-configure pdo_oci --with-pdo-oci=instantclient,$ORACLE_HOME \
+    && docker-php-ext-install pdo_oci
+```
+
+## Configuração Oracle no Laravel
+
+**Arquivo:** `config/database.php`
+
 ```php
-$pdo->setAttribute(\PDO::ATTR_AUTOCOMMIT, false); // CRÍTICO: Desabilitar autocommit
-$pdo->beginTransaction(); // CRÍTICO: Iniciar transação explicitamente
-// ... execução da procedure ...
-$pdo->commit(); // CRÍTICO: Commit explícito para persistir dados
+'oracle' => [
+    'driver' => 'oci8',
+    'host' => env('ORACLE_HOST', '10.36.100.101'),
+    'port' => env('ORACLE_PORT', '1521'),
+    'database' => env('ORACLE_DATABASE', 'consinco'),
+    'service_name' => env('ORACLE_SERVICE_NAME', 'consinco'),
+    'username' => env('ORACLE_USERNAME', 'consinco'),
+    'password' => env('ORACLE_PASSWORD', 'consinco'),
+    'charset' => env('ORACLE_CHARSET', 'AL32UTF8'),
+    'prefix_schema' => env('ORACLE_PREFIX_SCHEMA', 'consinco'),
+],
 ```
 
-### 2. Tratamento de Datas
-- Oracle requer formato específico com `TO_DATE()`
-- Conversão de datas antes da inserção no SQL
-- Remoção dos parâmetros de data do array de bind após conversão
+## Variáveis de Ambiente (Oracle)
 
-### 3. Parâmetros da Procedure
-- Total de 32 parâmetros conforme assinatura da procedure
-- Alguns parâmetros opcionais tratados com valores padrão
-- Parâmetros fixos: `p_nroformapagto = 1` e `p_usuinclusao = 'OMS-SUPREAL'`
-
-## Troubleshooting
-
-### Problema 1: "Unsupported driver [oci8]"
-**Solução:** Usar PDO diretamente em vez do Query Builder do Laravel
-
-### Problema 2: Dados não aparecem no banco após inserção
-**Solução:** Implementar controle manual de transação com commit explícito
-
-### Problema 3: Erro de formato de data
-**Solução:** Usar `TO_DATE()` do Oracle com formato 'YYYY-MM-DD'
-
-### Problema 4: Erro de parâmetros da procedure
-**Solução:** Verificar se todos os 32 parâmetros estão sendo passados na ordem correta
-
-## Logs e Monitoramento
-
-### Logs de Sucesso
+```env
+ORACLE_HOST=10.36.100.101
+ORACLE_PORT=1521
+ORACLE_DATABASE=consinco
+ORACLE_SERVICE_NAME=consinco
+ORACLE_USERNAME=consinco
+ORACLE_PASSWORD=consinco
+ORACLE_CHARSET=AL32UTF8
+ORACLE_PREFIX_SCHEMA=consinco
 ```
-SiteMercado: Tentativa de inserção de pedido
-SiteMercado: Transação commitada com sucesso  
-SiteMercado: Pedido inserido com sucesso
-```
-
-### Logs de Erro
-```
-SiteMercado: Erro ao inserir pedido
-- nropedidoafv
-- error (mensagem do erro)
-- trace (stack trace completo)
-```
-
-## Considerações de Performance
-
-1. **Conexão PDO:** Nova conexão criada a cada requisição
-2. **Transação:** Controle explícito evita locks desnecessários
-3. **Prepared Statements:** Proteção contra SQL injection
-4. **Logs:** Monitoramento detalhado sem impacto significativo
-
-## Segurança
-
-1. **Autenticação dupla:** Master Key + Developer Token
-2. **Validação rigorosa:** Todos os parâmetros validados
-3. **Prepared Statements:** Prevenção de SQL injection
-4. **Logs de auditoria:** Rastreabilidade completa das operações
-
-## Conclusão
-
-Esta implementação resolve com sucesso os problemas de compatibilidade entre Laravel e Oracle, fornecendo uma solução robusta e segura para inserção de pedidos no ERP. O controle manual de transações garante a consistência dos dados, enquanto a validação rigorosa assegura a qualidade das informações inseridas.
-
-A documentação serve como guia para futuras implementações similares e troubleshooting de problemas relacionados à integração Oracle/Laravel.

@@ -1,0 +1,17 @@
+version: "3.8"
+
+services:
+  app:
+    image: gitlab.supermercadosreal.com.br:5050/carlos.eduardo/supreal-api:main
+    container_name: supreal-api
+    restart: always
+    ports:
+      - "8000:80"
+    volumes:
+      - ./.env:/var/www/html/.env:ro
+    networks:
+      - supreal-api-network
+
+networks:
+  supreal-api-network:
+    driver: bridge

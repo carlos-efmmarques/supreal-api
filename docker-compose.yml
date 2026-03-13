@@ -1,0 +1,21 @@
+version: "3.8"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: supreal-api-dev
+    ports:
+      - "8000:80"
+    volumes:
+      - .:/var/www/html
+    env_file:
+      - .env
+    networks:
+      - supreal-api-network
+    restart: unless-stopped
+
+networks:
+  supreal-api-network:
+    driver: bridge
