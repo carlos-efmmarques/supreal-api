@@ -138,6 +138,7 @@ COPY --chown=www:www routes ./routes
 COPY --chown=www:www bootstrap ./bootstrap
 COPY --chown=www:www database ./database
 COPY --chown=www:www app ./app
+COPY --chown=www:www resources ./resources
 COPY --chown=www:www public ./public
 COPY --chown=www:www storage ./storage
 COPY --chown=www:www artisan ./
