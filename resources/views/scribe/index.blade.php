@@ -179,7 +179,15 @@ You can switch the language used with the tabs at the top right (or from the nav
 <p>
 </p>
 
-
+<p>Retorna todos os itens registrados no cupom com descrição do produto, valores, descontos e promoções,
+além dos dados do cliente associado (CPF/CNPJ) quando identificado.
+Ideal para montar a visualização de um cupom fiscal digital.</p>
+<p>O fluxo interno executa 3 consultas:</p>
+<ol>
+<li>Busca o <code>seqdocto</code> na tabela <code>TB_DOCTO</code> usando empresa + checkout + COO</li>
+<li>Recupera os itens do cupom em <code>TB_DOCTOITEM</code> com JOIN em <code>yandeh_produto</code> para descrição</li>
+<li>Busca o cliente em <code>TB_DOCTOCUPOM</code> (opcional, pode não existir)</li>
+</ol>
 
 <span id="example-requests-GETapi-v1-cupom">
 <blockquote>Example request:</blockquote>
@@ -232,14 +240,108 @@ fetch(url, {
 
 <span id="example-responses-GETapi-v1-cupom">
             <blockquote>
-            <p>Example response (200):</p>
+            <p>Example response (200, Cupom com cliente identificado):</p>
         </blockquote>
                 <pre>
 
-<code class="language-json" style="max-height: 300px;">{&quot;success&quot;: true, &quot;message&quot;: &quot;Cupom recuperado com sucesso&quot;, &quot;data&quot;: {&quot;seqdocto&quot;: 1120147, &quot;itens&quot;: [...], &quot;cliente&quot;: {...}}}</code>
+<code class="language-json" style="max-height: 300px;">{
+    &quot;success&quot;: true,
+    &quot;message&quot;: &quot;Cupom recuperado com sucesso&quot;,
+    &quot;data&quot;: {
+        &quot;seqdocto&quot;: 1120147,
+        &quot;nroempresa&quot;: 2,
+        &quot;nrocheckout&quot;: 11,
+        &quot;coo&quot;: 377249,
+        &quot;itens&quot;: [
+            {
+                &quot;DESCRICAO&quot;: &quot;ARROZ BRANCO TIPO 1 5KG&quot;,
+                &quot;SEQITEM&quot;: 1,
+                &quot;DTAHOREMISSAO&quot;: &quot;2025-06-15 10:32:00&quot;,
+                &quot;SEQPRODUTO&quot;: 45678,
+                &quot;CODACESSO&quot;: &quot;7891234567890&quot;,
+                &quot;QUANTIDADE&quot;: 2,
+                &quot;VLRUNITARIO&quot;: 24.9,
+                &quot;VLRDESCONTO&quot;: 0,
+                &quot;VLRTOTAL&quot;: 49.8,
+                &quot;NROTRIBUTACAO&quot;: 1,
+                &quot;STATUS&quot;: &quot;A&quot;,
+                &quot;PROMOCAO&quot;: null,
+                &quot;INSERCAO&quot;: 1
+            },
+            {
+                &quot;DESCRICAO&quot;: &quot;LEITE INTEGRAL 1L&quot;,
+                &quot;SEQITEM&quot;: 2,
+                &quot;DTAHOREMISSAO&quot;: &quot;2025-06-15 10:32:15&quot;,
+                &quot;SEQPRODUTO&quot;: 12345,
+                &quot;CODACESSO&quot;: &quot;7890987654321&quot;,
+                &quot;QUANTIDADE&quot;: 6,
+                &quot;VLRUNITARIO&quot;: 5.49,
+                &quot;VLRDESCONTO&quot;: 3,
+                &quot;VLRTOTAL&quot;: 29.94,
+                &quot;NROTRIBUTACAO&quot;: 1,
+                &quot;STATUS&quot;: &quot;A&quot;,
+                &quot;PROMOCAO&quot;: &quot;LEVE 6 PAGUE 5&quot;,
+                &quot;INSERCAO&quot;: 2
+            },
+            {
+                &quot;DESCRICAO&quot;: &quot;DETERGENTE NEUTRO 500ML&quot;,
+                &quot;SEQITEM&quot;: 3,
+                &quot;DTAHOREMISSAO&quot;: &quot;2025-06-15 10:32:30&quot;,
+                &quot;SEQPRODUTO&quot;: 78901,
+                &quot;CODACESSO&quot;: &quot;7894561237890&quot;,
+                &quot;QUANTIDADE&quot;: 1,
+                &quot;VLRUNITARIO&quot;: 2.99,
+                &quot;VLRDESCONTO&quot;: 0,
+                &quot;VLRTOTAL&quot;: 2.99,
+                &quot;NROTRIBUTACAO&quot;: 2,
+                &quot;STATUS&quot;: &quot;A&quot;,
+                &quot;PROMOCAO&quot;: null,
+                &quot;INSERCAO&quot;: 3
+            }
+        ],
+        &quot;cliente&quot;: {
+            &quot;CNPJCPF&quot;: &quot;12345678901&quot;,
+            &quot;SEQPESSOA&quot;: 98765
+        }
+    }
+}</code>
  </pre>
             <blockquote>
-            <p>Example response (404):</p>
+            <p>Example response (200, Cupom sem cliente identificado):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;success&quot;: true,
+    &quot;message&quot;: &quot;Cupom recuperado com sucesso&quot;,
+    &quot;data&quot;: {
+        &quot;seqdocto&quot;: 1120200,
+        &quot;nroempresa&quot;: 2,
+        &quot;nrocheckout&quot;: 11,
+        &quot;coo&quot;: 377300,
+        &quot;itens&quot;: [
+            {
+                &quot;DESCRICAO&quot;: &quot;CAFE TORRADO MOIDO 500G&quot;,
+                &quot;SEQITEM&quot;: 1,
+                &quot;DTAHOREMISSAO&quot;: &quot;2025-06-15 14:05:00&quot;,
+                &quot;SEQPRODUTO&quot;: 33210,
+                &quot;CODACESSO&quot;: &quot;7891112223334&quot;,
+                &quot;QUANTIDADE&quot;: 1,
+                &quot;VLRUNITARIO&quot;: 18.9,
+                &quot;VLRDESCONTO&quot;: 0,
+                &quot;VLRTOTAL&quot;: 18.9,
+                &quot;NROTRIBUTACAO&quot;: 1,
+                &quot;STATUS&quot;: &quot;A&quot;,
+                &quot;PROMOCAO&quot;: null,
+                &quot;INSERCAO&quot;: 1
+            }
+        ],
+        &quot;cliente&quot;: null
+    }
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (404, Cupom não encontrado):</p>
         </blockquote>
                 <pre>
 
@@ -250,20 +352,39 @@ fetch(url, {
 }</code>
  </pre>
             <blockquote>
-            <p>Example response (422):</p>
-        </blockquote>
-                <pre>
-
-<code class="language-json" style="max-height: 300px;">{&quot;success&quot;: false, &quot;message&quot;: &quot;Erro de valida&ccedil;&atilde;o dos par&acirc;metros do cupom&quot;, &quot;data&quot;: {...}}</code>
- </pre>
-            <blockquote>
-            <p>Example response (500):</p>
+            <p>Example response (422, Parâmetros inválidos):</p>
         </blockquote>
                 <pre>
 
 <code class="language-json" style="max-height: 300px;">{
     &quot;success&quot;: false,
-    &quot;message&quot;: &quot;Erro ao consultar cupom&quot;,
+    &quot;message&quot;: &quot;Erro de valida&ccedil;&atilde;o dos par&acirc;metros do cupom&quot;,
+    &quot;data&quot;: {
+        &quot;nroempresa&quot;: [
+            &quot;O n&uacute;mero da empresa &eacute; obrigat&oacute;rio&quot;
+        ],
+        &quot;coo&quot;: [
+            &quot;O COO deve ser um n&uacute;mero inteiro&quot;
+        ]
+    },
+    &quot;errors&quot;: {
+        &quot;nroempresa&quot;: [
+            &quot;O n&uacute;mero da empresa &eacute; obrigat&oacute;rio&quot;
+        ],
+        &quot;coo&quot;: [
+            &quot;O COO deve ser um n&uacute;mero inteiro&quot;
+        ]
+    }
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (500, Erro de conexão com Oracle):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;success&quot;: false,
+    &quot;message&quot;: &quot;Erro ao consultar cupom: could not connect to Oracle&quot;,
     &quot;data&quot;: null
 }</code>
  </pre>
@@ -347,7 +468,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                value="2"
                data-component="query">
     <br>
-<p>Número da empresa. Example: <code>2</code></p>
+<p>Número da empresa no ERP. Example: <code>2</code></p>
             </div>
                                     <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>nrocheckout</code></b>&nbsp;&nbsp;
@@ -358,7 +479,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                value="11"
                data-component="query">
     <br>
-<p>Número do checkout. Example: <code>11</code></p>
+<p>Número do checkout (caixa) que emitiu o cupom. Example: <code>11</code></p>
             </div>
                                     <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>coo</code></b>&nbsp;&nbsp;
@@ -369,7 +490,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                value="377249"
                data-component="query">
     <br>
-<p>Contador de Ordem de Operação. Example: <code>377249</code></p>
+<p>COO - Contador de Ordem de Operação do cupom fiscal. Example: <code>377249</code></p>
             </div>
                         <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
         <div style=" padding-left: 28px;  clear: unset;">

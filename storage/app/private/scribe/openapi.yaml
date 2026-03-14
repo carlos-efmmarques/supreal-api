@@ -24,51 +24,336 @@ paths:
     get:
       summary: 'Consulta os dados completos de um cupom fiscal (itens e cliente)'
       operationId: consultaOsDadosCompletosDeUmCupomFiscalitensECliente
-      description: ''
+      description: "Retorna todos os itens registrados no cupom com descrição do produto, valores, descontos e promoções,\nalém dos dados do cliente associado (CPF/CNPJ) quando identificado.\nIdeal para montar a visualização de um cupom fiscal digital.\n\nO fluxo interno executa 3 consultas:\n1. Busca o `seqdocto` na tabela `TB_DOCTO` usando empresa + checkout + COO\n2. Recupera os itens do cupom em `TB_DOCTOITEM` com JOIN em `yandeh_produto` para descrição\n3. Busca o cliente em `TB_DOCTOCUPOM` (opcional, pode não existir)"
       parameters:
         -
           in: query
           name: nroempresa
-          description: 'Número da empresa.'
+          description: 'Número da empresa no ERP.'
           example: 2
           required: true
           schema:
             type: integer
-            description: 'Número da empresa.'
+            description: 'Número da empresa no ERP.'
             example: 2
             nullable: false
         -
           in: query
           name: nrocheckout
-          description: 'Número do checkout.'
+          description: 'Número do checkout (caixa) que emitiu o cupom.'
           example: 11
           required: true
           schema:
             type: integer
-            description: 'Número do checkout.'
+            description: 'Número do checkout (caixa) que emitiu o cupom.'
             example: 11
             nullable: false
         -
           in: query
           name: coo
-          description: 'Contador de Ordem de Operação.'
+          description: 'COO - Contador de Ordem de Operação do cupom fiscal.'
           example: 377249
           required: true
           schema:
             type: integer
-            description: 'Contador de Ordem de Operação.'
+            description: 'COO - Contador de Ordem de Operação do cupom fiscal.'
             example: 377249
             nullable: false
       responses:
         200:
           description: ''
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
-                example: '{"success": true, "message": "Cupom recuperado com sucesso", "data": {"seqdocto": 1120147, "itens": [...], "cliente": {...}}}'
+                oneOf:
+                  -
+                    description: 'Cupom com cliente identificado'
+                    type: object
+                    example:
+                      success: true
+                      message: 'Cupom recuperado com sucesso'
+                      data:
+                        seqdocto: 1120147
+                        nroempresa: 2
+                        nrocheckout: 11
+                        coo: 377249
+                        itens:
+                          -
+                            DESCRICAO: 'ARROZ BRANCO TIPO 1 5KG'
+                            SEQITEM: 1
+                            DTAHOREMISSAO: '2025-06-15 10:32:00'
+                            SEQPRODUTO: 45678
+                            CODACESSO: '7891234567890'
+                            QUANTIDADE: 2
+                            VLRUNITARIO: 24.9
+                            VLRDESCONTO: 0
+                            VLRTOTAL: 49.8
+                            NROTRIBUTACAO: 1
+                            STATUS: A
+                            PROMOCAO: null
+                            INSERCAO: 1
+                          -
+                            DESCRICAO: 'LEITE INTEGRAL 1L'
+                            SEQITEM: 2
+                            DTAHOREMISSAO: '2025-06-15 10:32:15'
+                            SEQPRODUTO: 12345
+                            CODACESSO: '7890987654321'
+                            QUANTIDADE: 6
+                            VLRUNITARIO: 5.49
+                            VLRDESCONTO: 3.0
+                            VLRTOTAL: 29.94
+                            NROTRIBUTACAO: 1
+                            STATUS: A
+                            PROMOCAO: 'LEVE 6 PAGUE 5'
+                            INSERCAO: 2
+                          -
+                            DESCRICAO: 'DETERGENTE NEUTRO 500ML'
+                            SEQITEM: 3
+                            DTAHOREMISSAO: '2025-06-15 10:32:30'
+                            SEQPRODUTO: 78901
+                            CODACESSO: '7894561237890'
+                            QUANTIDADE: 1
+                            VLRUNITARIO: 2.99
+                            VLRDESCONTO: 0
+                            VLRTOTAL: 2.99
+                            NROTRIBUTACAO: 2
+                            STATUS: A
+                            PROMOCAO: null
+                            INSERCAO: 3
+                        cliente:
+                          CNPJCPF: '12345678901'
+                          SEQPESSOA: 98765
+                    properties:
+                      success:
+                        type: boolean
+                        example: true
+                      message:
+                        type: string
+                        example: 'Cupom recuperado com sucesso'
+                      data:
+                        type: object
+                        properties:
+                          seqdocto:
+                            type: integer
+                            example: 1120147
+                          nroempresa:
+                            type: integer
+                            example: 2
+                          nrocheckout:
+                            type: integer
+                            example: 11
+                          coo:
+                            type: integer
+                            example: 377249
+                          itens:
+                            type: array
+                            example:
+                              -
+                                DESCRICAO: 'ARROZ BRANCO TIPO 1 5KG'
+                                SEQITEM: 1
+                                DTAHOREMISSAO: '2025-06-15 10:32:00'
+                                SEQPRODUTO: 45678
+                                CODACESSO: '7891234567890'
+                                QUANTIDADE: 2
+                                VLRUNITARIO: 24.9
+                                VLRDESCONTO: 0
+                                VLRTOTAL: 49.8
+                                NROTRIBUTACAO: 1
+                                STATUS: A
+                                PROMOCAO: null
+                                INSERCAO: 1
+                              -
+                                DESCRICAO: 'LEITE INTEGRAL 1L'
+                                SEQITEM: 2
+                                DTAHOREMISSAO: '2025-06-15 10:32:15'
+                                SEQPRODUTO: 12345
+                                CODACESSO: '7890987654321'
+                                QUANTIDADE: 6
+                                VLRUNITARIO: 5.49
+                                VLRDESCONTO: 3
+                                VLRTOTAL: 29.94
+                                NROTRIBUTACAO: 1
+                                STATUS: A
+                                PROMOCAO: 'LEVE 6 PAGUE 5'
+                                INSERCAO: 2
+                              -
+                                DESCRICAO: 'DETERGENTE NEUTRO 500ML'
+                                SEQITEM: 3
+                                DTAHOREMISSAO: '2025-06-15 10:32:30'
+                                SEQPRODUTO: 78901
+                                CODACESSO: '7894561237890'
+                                QUANTIDADE: 1
+                                VLRUNITARIO: 2.99
+                                VLRDESCONTO: 0
+                                VLRTOTAL: 2.99
+                                NROTRIBUTACAO: 2
+                                STATUS: A
+                                PROMOCAO: null
+                                INSERCAO: 3
+                            items:
+                              type: object
+                              properties:
+                                DESCRICAO:
+                                  type: string
+                                  example: 'ARROZ BRANCO TIPO 1 5KG'
+                                SEQITEM:
+                                  type: integer
+                                  example: 1
+                                DTAHOREMISSAO:
+                                  type: string
+                                  example: '2025-06-15 10:32:00'
+                                SEQPRODUTO:
+                                  type: integer
+                                  example: 45678
+                                CODACESSO:
+                                  type: string
+                                  example: '7891234567890'
+                                QUANTIDADE:
+                                  type: integer
+                                  example: 2
+                                VLRUNITARIO:
+                                  type: number
+                                  example: 24.9
+                                VLRDESCONTO:
+                                  type: integer
+                                  example: 0
+                                VLRTOTAL:
+                                  type: number
+                                  example: 49.8
+                                NROTRIBUTACAO:
+                                  type: integer
+                                  example: 1
+                                STATUS:
+                                  type: string
+                                  example: A
+                                PROMOCAO:
+                                  type: string
+                                  example: null
+                                INSERCAO:
+                                  type: integer
+                                  example: 1
+                          cliente:
+                            type: object
+                            properties:
+                              CNPJCPF:
+                                type: string
+                                example: '12345678901'
+                              SEQPESSOA:
+                                type: integer
+                                example: 98765
+                  -
+                    description: 'Cupom sem cliente identificado'
+                    type: object
+                    example:
+                      success: true
+                      message: 'Cupom recuperado com sucesso'
+                      data:
+                        seqdocto: 1120200
+                        nroempresa: 2
+                        nrocheckout: 11
+                        coo: 377300
+                        itens:
+                          -
+                            DESCRICAO: 'CAFE TORRADO MOIDO 500G'
+                            SEQITEM: 1
+                            DTAHOREMISSAO: '2025-06-15 14:05:00'
+                            SEQPRODUTO: 33210
+                            CODACESSO: '7891112223334'
+                            QUANTIDADE: 1
+                            VLRUNITARIO: 18.9
+                            VLRDESCONTO: 0
+                            VLRTOTAL: 18.9
+                            NROTRIBUTACAO: 1
+                            STATUS: A
+                            PROMOCAO: null
+                            INSERCAO: 1
+                        cliente: null
+                    properties:
+                      success:
+                        type: boolean
+                        example: true
+                      message:
+                        type: string
+                        example: 'Cupom recuperado com sucesso'
+                      data:
+                        type: object
+                        properties:
+                          seqdocto:
+                            type: integer
+                            example: 1120200
+                          nroempresa:
+                            type: integer
+                            example: 2
+                          nrocheckout:
+                            type: integer
+                            example: 11
+                          coo:
+                            type: integer
+                            example: 377300
+                          itens:
+                            type: array
+                            example:
+                              -
+                                DESCRICAO: 'CAFE TORRADO MOIDO 500G'
+                                SEQITEM: 1
+                                DTAHOREMISSAO: '2025-06-15 14:05:00'
+                                SEQPRODUTO: 33210
+                                CODACESSO: '7891112223334'
+                                QUANTIDADE: 1
+                                VLRUNITARIO: 18.9
+                                VLRDESCONTO: 0
+                                VLRTOTAL: 18.9
+                                NROTRIBUTACAO: 1
+                                STATUS: A
+                                PROMOCAO: null
+                                INSERCAO: 1
+                            items:
+                              type: object
+                              properties:
+                                DESCRICAO:
+                                  type: string
+                                  example: 'CAFE TORRADO MOIDO 500G'
+                                SEQITEM:
+                                  type: integer
+                                  example: 1
+                                DTAHOREMISSAO:
+                                  type: string
+                                  example: '2025-06-15 14:05:00'
+                                SEQPRODUTO:
+                                  type: integer
+                                  example: 33210
+                                CODACESSO:
+                                  type: string
+                                  example: '7891112223334'
+                                QUANTIDADE:
+                                  type: integer
+                                  example: 1
+                                VLRUNITARIO:
+                                  type: number
+                                  example: 18.9
+                                VLRDESCONTO:
+                                  type: integer
+                                  example: 0
+                                VLRTOTAL:
+                                  type: number
+                                  example: 18.9
+                                NROTRIBUTACAO:
+                                  type: integer
+                                  example: 1
+                                STATUS:
+                                  type: string
+                                  example: A
+                                PROMOCAO:
+                                  type: string
+                                  example: null
+                                INSERCAO:
+                                  type: integer
+                                  example: 1
+                          cliente:
+                            type: string
+                            example: null
         404:
-          description: ''
+          description: 'Cupom não encontrado'
           content:
             application/json:
               schema:
@@ -88,21 +373,70 @@ paths:
                     type: string
                     example: null
         422:
-          description: ''
-          content:
-            text/plain:
-              schema:
-                type: string
-                example: '{"success": false, "message": "Erro de validação dos parâmetros do cupom", "data": {...}}'
-        500:
-          description: ''
+          description: 'Parâmetros inválidos'
           content:
             application/json:
               schema:
                 type: object
                 example:
                   success: false
-                  message: 'Erro ao consultar cupom'
+                  message: 'Erro de validação dos parâmetros do cupom'
+                  data:
+                    nroempresa:
+                      - 'O número da empresa é obrigatório'
+                    coo:
+                      - 'O COO deve ser um número inteiro'
+                  errors:
+                    nroempresa:
+                      - 'O número da empresa é obrigatório'
+                    coo:
+                      - 'O COO deve ser um número inteiro'
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: 'Erro de validação dos parâmetros do cupom'
+                  data:
+                    type: object
+                    properties:
+                      nroempresa:
+                        type: array
+                        example:
+                          - 'O número da empresa é obrigatório'
+                        items:
+                          type: string
+                      coo:
+                        type: array
+                        example:
+                          - 'O COO deve ser um número inteiro'
+                        items:
+                          type: string
+                  errors:
+                    type: object
+                    properties:
+                      nroempresa:
+                        type: array
+                        example:
+                          - 'O número da empresa é obrigatório'
+                        items:
+                          type: string
+                      coo:
+                        type: array
+                        example:
+                          - 'O COO deve ser um número inteiro'
+                        items:
+                          type: string
+        500:
+          description: 'Erro de conexão com Oracle'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: 'Erro ao consultar cupom: could not connect to Oracle'
                   data: null
                 properties:
                   success:
@@ -110,7 +444,7 @@ paths:
                     example: false
                   message:
                     type: string
-                    example: 'Erro ao consultar cupom'
+                    example: 'Erro ao consultar cupom: could not connect to Oracle'
                   data:
                     type: string
                     example: null

@@ -21,14 +21,25 @@ class CupomController extends BaseController
     /**
      * Consulta os dados completos de um cupom fiscal (itens e cliente)
      *
+     * Retorna todos os itens registrados no cupom com descrição do produto, valores, descontos e promoções,
+     * além dos dados do cliente associado (CPF/CNPJ) quando identificado.
+     * Ideal para montar a visualização de um cupom fiscal digital.
+     *
+     * O fluxo interno executa 3 consultas:
+     * 1. Busca o `seqdocto` na tabela `TB_DOCTO` usando empresa + checkout + COO
+     * 2. Recupera os itens do cupom em `TB_DOCTOITEM` com JOIN em `yandeh_produto` para descrição
+     * 3. Busca o cliente em `TB_DOCTOCUPOM` (opcional, pode não existir)
+     *
      * @group Cupom Digital
-     * @queryParam nroempresa integer required Número da empresa. Example: 2
-     * @queryParam nrocheckout integer required Número do checkout. Example: 11
-     * @queryParam coo integer required Contador de Ordem de Operação. Example: 377249
-     * @response 200 {"success": true, "message": "Cupom recuperado com sucesso", "data": {"seqdocto": 1120147, "itens": [...], "cliente": {...}}}
-     * @response 404 {"success": false, "message": "Cupom não encontrado para os parâmetros informados", "data": null}
-     * @response 422 {"success": false, "message": "Erro de validação dos parâmetros do cupom", "data": {...}}
-     * @response 500 {"success": false, "message": "Erro ao consultar cupom", "data": null}
+     * @queryParam nroempresa integer required Número da empresa no ERP. Example: 2
+     * @queryParam nrocheckout integer required Número do checkout (caixa) que emitiu o cupom. Example: 11
+     * @queryParam coo integer required COO - Contador de Ordem de Operação do cupom fiscal. Example: 377249
+     *
+     * @response 200 scenario="Cupom com cliente identificado" {"success":true,"message":"Cupom recuperado com sucesso","data":{"seqdocto":1120147,"nroempresa":2,"nrocheckout":11,"coo":377249,"itens":[{"DESCRICAO":"ARROZ BRANCO TIPO 1 5KG","SEQITEM":1,"DTAHOREMISSAO":"2025-06-15 10:32:00","SEQPRODUTO":45678,"CODACESSO":"7891234567890","QUANTIDADE":2,"VLRUNITARIO":24.90,"VLRDESCONTO":0,"VLRTOTAL":49.80,"NROTRIBUTACAO":1,"STATUS":"A","PROMOCAO":null,"INSERCAO":1},{"DESCRICAO":"LEITE INTEGRAL 1L","SEQITEM":2,"DTAHOREMISSAO":"2025-06-15 10:32:15","SEQPRODUTO":12345,"CODACESSO":"7890987654321","QUANTIDADE":6,"VLRUNITARIO":5.49,"VLRDESCONTO":3.00,"VLRTOTAL":29.94,"NROTRIBUTACAO":1,"STATUS":"A","PROMOCAO":"LEVE 6 PAGUE 5","INSERCAO":2},{"DESCRICAO":"DETERGENTE NEUTRO 500ML","SEQITEM":3,"DTAHOREMISSAO":"2025-06-15 10:32:30","SEQPRODUTO":78901,"CODACESSO":"7894561237890","QUANTIDADE":1,"VLRUNITARIO":2.99,"VLRDESCONTO":0,"VLRTOTAL":2.99,"NROTRIBUTACAO":2,"STATUS":"A","PROMOCAO":null,"INSERCAO":3}],"cliente":{"CNPJCPF":"12345678901","SEQPESSOA":98765}}}
+     * @response 200 scenario="Cupom sem cliente identificado" {"success":true,"message":"Cupom recuperado com sucesso","data":{"seqdocto":1120200,"nroempresa":2,"nrocheckout":11,"coo":377300,"itens":[{"DESCRICAO":"CAFE TORRADO MOIDO 500G","SEQITEM":1,"DTAHOREMISSAO":"2025-06-15 14:05:00","SEQPRODUTO":33210,"CODACESSO":"7891112223334","QUANTIDADE":1,"VLRUNITARIO":18.90,"VLRDESCONTO":0,"VLRTOTAL":18.90,"NROTRIBUTACAO":1,"STATUS":"A","PROMOCAO":null,"INSERCAO":1}],"cliente":null}}
+     * @response 404 scenario="Cupom não encontrado" {"success":false,"message":"Cupom não encontrado para os parâmetros informados","data":null}
+     * @response 422 scenario="Parâmetros inválidos" {"success":false,"message":"Erro de validação dos parâmetros do cupom","data":{"nroempresa":["O número da empresa é obrigatório"],"coo":["O COO deve ser um número inteiro"]},"errors":{"nroempresa":["O número da empresa é obrigatório"],"coo":["O COO deve ser um número inteiro"]}}
+     * @response 500 scenario="Erro de conexão com Oracle" {"success":false,"message":"Erro ao consultar cupom: could not connect to Oracle","data":null}
      */
     public function show(ConsultaCupomRequest $request): JsonResponse
     {

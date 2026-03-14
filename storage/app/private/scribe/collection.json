@@ -10,7 +10,7 @@
     ],
     "info": {
         "name": "Supreal API API Documentation",
-        "_postman_id": "71713f06-e913-4d16-9536-20b4a30aec2d",
+        "_postman_id": "e1f4cc1f-485a-4ab0-9d6d-8046dac45444",
         "description": "",
         "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
     },
@@ -29,19 +29,19 @@
                                 {
                                     "key": "nroempresa",
                                     "value": "2",
-                                    "description": "N\u00famero da empresa.",
+                                    "description": "N\u00famero da empresa no ERP.",
                                     "disabled": false
                                 },
                                 {
                                     "key": "nrocheckout",
                                     "value": "11",
-                                    "description": "N\u00famero do checkout.",
+                                    "description": "N\u00famero do checkout (caixa) que emitiu o cupom.",
                                     "disabled": false
                                 },
                                 {
                                     "key": "coo",
                                     "value": "377249",
-                                    "description": "Contador de Ordem de Opera\u00e7\u00e3o.",
+                                    "description": "COO - Contador de Ordem de Opera\u00e7\u00e3o do cupom fiscal.",
                                     "disabled": false
                                 }
                             ],
@@ -62,7 +62,7 @@
                             "mode": "raw",
                             "raw": "{\"nroempresa\":16,\"nrocheckout\":16,\"coo\":16}"
                         },
-                        "description": "",
+                        "description": "Retorna todos os itens registrados no cupom com descri\u00e7\u00e3o do produto, valores, descontos e promo\u00e7\u00f5es,\nal\u00e9m dos dados do cliente associado (CPF\/CNPJ) quando identificado.\nIdeal para montar a visualiza\u00e7\u00e3o de um cupom fiscal digital.\n\nO fluxo interno executa 3 consultas:\n1. Busca o `seqdocto` na tabela `TB_DOCTO` usando empresa + checkout + COO\n2. Recupera os itens do cupom em `TB_DOCTOITEM` com JOIN em `yandeh_produto` para descri\u00e7\u00e3o\n3. Busca o cliente em `TB_DOCTOCUPOM` (opcional, pode n\u00e3o existir)",
                         "auth": {
                             "type": "noauth"
                         }
@@ -71,26 +71,32 @@
                         {
                             "header": [],
                             "code": 200,
-                            "body": "{\"success\": true, \"message\": \"Cupom recuperado com sucesso\", \"data\": {\"seqdocto\": 1120147, \"itens\": [...], \"cliente\": {...}}}",
-                            "name": ""
+                            "body": "{\"success\":true,\"message\":\"Cupom recuperado com sucesso\",\"data\":{\"seqdocto\":1120147,\"nroempresa\":2,\"nrocheckout\":11,\"coo\":377249,\"itens\":[{\"DESCRICAO\":\"ARROZ BRANCO TIPO 1 5KG\",\"SEQITEM\":1,\"DTAHOREMISSAO\":\"2025-06-15 10:32:00\",\"SEQPRODUTO\":45678,\"CODACESSO\":\"7891234567890\",\"QUANTIDADE\":2,\"VLRUNITARIO\":24.90,\"VLRDESCONTO\":0,\"VLRTOTAL\":49.80,\"NROTRIBUTACAO\":1,\"STATUS\":\"A\",\"PROMOCAO\":null,\"INSERCAO\":1},{\"DESCRICAO\":\"LEITE INTEGRAL 1L\",\"SEQITEM\":2,\"DTAHOREMISSAO\":\"2025-06-15 10:32:15\",\"SEQPRODUTO\":12345,\"CODACESSO\":\"7890987654321\",\"QUANTIDADE\":6,\"VLRUNITARIO\":5.49,\"VLRDESCONTO\":3.00,\"VLRTOTAL\":29.94,\"NROTRIBUTACAO\":1,\"STATUS\":\"A\",\"PROMOCAO\":\"LEVE 6 PAGUE 5\",\"INSERCAO\":2},{\"DESCRICAO\":\"DETERGENTE NEUTRO 500ML\",\"SEQITEM\":3,\"DTAHOREMISSAO\":\"2025-06-15 10:32:30\",\"SEQPRODUTO\":78901,\"CODACESSO\":\"7894561237890\",\"QUANTIDADE\":1,\"VLRUNITARIO\":2.99,\"VLRDESCONTO\":0,\"VLRTOTAL\":2.99,\"NROTRIBUTACAO\":2,\"STATUS\":\"A\",\"PROMOCAO\":null,\"INSERCAO\":3}],\"cliente\":{\"CNPJCPF\":\"12345678901\",\"SEQPESSOA\":98765}}}",
+                            "name": "Cupom com cliente identificado"
+                        },
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"success\":true,\"message\":\"Cupom recuperado com sucesso\",\"data\":{\"seqdocto\":1120200,\"nroempresa\":2,\"nrocheckout\":11,\"coo\":377300,\"itens\":[{\"DESCRICAO\":\"CAFE TORRADO MOIDO 500G\",\"SEQITEM\":1,\"DTAHOREMISSAO\":\"2025-06-15 14:05:00\",\"SEQPRODUTO\":33210,\"CODACESSO\":\"7891112223334\",\"QUANTIDADE\":1,\"VLRUNITARIO\":18.90,\"VLRDESCONTO\":0,\"VLRTOTAL\":18.90,\"NROTRIBUTACAO\":1,\"STATUS\":\"A\",\"PROMOCAO\":null,\"INSERCAO\":1}],\"cliente\":null}}",
+                            "name": "Cupom sem cliente identificado"
                         },
                         {
                             "header": [],
                             "code": 404,
-                            "body": "{\"success\": false, \"message\": \"Cupom n\u00e3o encontrado para os par\u00e2metros informados\", \"data\": null}",
-                            "name": ""
+                            "body": "{\"success\":false,\"message\":\"Cupom n\u00e3o encontrado para os par\u00e2metros informados\",\"data\":null}",
+                            "name": "Cupom n\u00e3o encontrado"
                         },
                         {
                             "header": [],
                             "code": 422,
-                            "body": "{\"success\": false, \"message\": \"Erro de valida\u00e7\u00e3o dos par\u00e2metros do cupom\", \"data\": {...}}",
-                            "name": ""
+                            "body": "{\"success\":false,\"message\":\"Erro de valida\u00e7\u00e3o dos par\u00e2metros do cupom\",\"data\":{\"nroempresa\":[\"O n\u00famero da empresa \u00e9 obrigat\u00f3rio\"],\"coo\":[\"O COO deve ser um n\u00famero inteiro\"]},\"errors\":{\"nroempresa\":[\"O n\u00famero da empresa \u00e9 obrigat\u00f3rio\"],\"coo\":[\"O COO deve ser um n\u00famero inteiro\"]}}",
+                            "name": "Par\u00e2metros inv\u00e1lidos"
                         },
                         {
                             "header": [],
                             "code": 500,
-                            "body": "{\"success\": false, \"message\": \"Erro ao consultar cupom\", \"data\": null}",
-                            "name": ""
+                            "body": "{\"success\":false,\"message\":\"Erro ao consultar cupom: could not connect to Oracle\",\"data\":null}",
+                            "name": "Erro de conex\u00e3o com Oracle"
                         }
                     ]
                 }
