@@ -80,9 +80,8 @@ class CupomController extends BaseController
             $seqdocto = $docto['SEQDOCTO'];
 
             // 2. Buscar os itens do cupom
-            // Usar CONVERT para garantir UTF-8 na descrição (Oracle pode usar charset diferente)
             $stmtItens = $pdo->prepare("
-                SELECT  yp.DESCRICAO,
+                SELECT  yp.NOME AS DESCRICAO,
                         td.SEQITEM,
                         td.DTAHOREMISSAO,
                         td.SEQPRODUTO,
