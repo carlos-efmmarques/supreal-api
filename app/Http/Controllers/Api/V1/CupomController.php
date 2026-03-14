@@ -94,11 +94,10 @@ class CupomController extends BaseController
                         td.STATUS,
                         td.PROMOCAO,
                         td.INSERCAO
-                FROM consincomonitor.TB_DOCTOITEM td
-                JOIN yandeh_produto yp
-                  ON td.CODACESSO = yp.SKU
-                 AND td.NROEMPRESA = yp.ID_LOJA
-                WHERE td.NROEMPRESA = :nroempresa
+                FROM consincomonitor.TB_DOCTOITEM td, yandeh_produto yp
+                WHERE td.SEQPRODUTO = yp.CODIGO_INTERNO
+                  AND td.NROEMPRESA = yp.ID_LOJA
+                  AND td.NROEMPRESA = :nroempresa
                   AND td.NROCHECKOUT = :nrocheckout
                   AND td.SEQDOCTO = :seqdocto
             ");
