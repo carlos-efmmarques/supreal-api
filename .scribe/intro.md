@@ -1,32 +1,13 @@
 # Introduction
 
-API interna para comunicação entre sistemas da empresa
+
 
 <aside>
-    <strong>Base URL</strong>: <code>http://localhost:8000</code>
+    <strong>Base URL</strong>: <code>http://127.0.0.1</code>
 </aside>
 
-    Esta documentação fornece todas as informações necessárias para trabalhar com nossa API interna.
+    This documentation aims to provide all the information you need to work with our API.
 
-    ## Autenticação
-    Todas as requisições para a API devem incluir um token Bearer no header Authorization:
-    ```
-    Authorization: Bearer SEU_TOKEN_AQUI
-    ```
-
-    ## Formato de Resposta
-    Todas as respostas seguem o padrão:
-    ```json
-    {
-        "success": true|false,
-        "message": "Mensagem descritiva",
-        "data": {}
-    }
-    ```
-
-    ## Rate Limiting
-    Por padrão, cada token tem um limite de 60 requisições por minuto.
-
-    <aside>Você verá exemplos de código em diferentes linguagens de programação na área escura à direita (ou como parte do conteúdo no mobile).
-    Você pode alternar a linguagem usando as abas no canto superior direito.</aside>
+    <aside>As you scroll, you'll see code examples for working with the API in different programming languages in the dark area to the right (or as part of the content on mobile).
+    You can switch the language used with the tabs at the top right (or from the nav menu at the top left on mobile).</aside>
 

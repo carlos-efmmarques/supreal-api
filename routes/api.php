@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\TokenController;
 use App\Http\Controllers\Api\V1\ExampleController;
 use App\Http\Controllers\Api\V1\SiteMercadoController;
+use App\Http\Controllers\Api\V1\CupomController;
 
 /*
 |--------------------------------------------------------------------------
@@ -44,6 +45,9 @@ Route::prefix('v1')->middleware(['auth.api'])->name('api.v1.')->group(function (
         Route::post('/itens', [SiteMercadoController::class, 'insereItens'])->name('itens.store');
     });
     
+    // Cupom Digital - Consulta de cupom fiscal
+    Route::get('/cupom', [CupomController::class, 'show'])->name('cupom.show');
+
     // Adicione aqui novos grupos de rotas para outros recursos
     // Route::apiResource('users', UserController::class);
     // Route::apiResource('products', ProductController::class);

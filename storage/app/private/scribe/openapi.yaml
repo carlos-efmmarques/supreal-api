@@ -8,6 +8,9 @@ servers:
     url: 'http://127.0.0.1'
 tags:
   -
+    name: 'Cupom Digital'
+    description: ''
+  -
     name: Endpoints
     description: ''
   -
@@ -17,6 +20,129 @@ tags:
     name: 'Site Mercado'
     description: ''
 paths:
+  /api/v1/cupom:
+    get:
+      summary: 'Consulta os dados completos de um cupom fiscal (itens e cliente)'
+      operationId: consultaOsDadosCompletosDeUmCupomFiscalitensECliente
+      description: ''
+      parameters:
+        -
+          in: query
+          name: nroempresa
+          description: 'Número da empresa.'
+          example: 2
+          required: true
+          schema:
+            type: integer
+            description: 'Número da empresa.'
+            example: 2
+            nullable: false
+        -
+          in: query
+          name: nrocheckout
+          description: 'Número do checkout.'
+          example: 11
+          required: true
+          schema:
+            type: integer
+            description: 'Número do checkout.'
+            example: 11
+            nullable: false
+        -
+          in: query
+          name: coo
+          description: 'Contador de Ordem de Operação.'
+          example: 377249
+          required: true
+          schema:
+            type: integer
+            description: 'Contador de Ordem de Operação.'
+            example: 377249
+            nullable: false
+      responses:
+        200:
+          description: ''
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: '{"success": true, "message": "Cupom recuperado com sucesso", "data": {"seqdocto": 1120147, "itens": [...], "cliente": {...}}}'
+        404:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: 'Cupom não encontrado para os parâmetros informados'
+                  data: null
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: 'Cupom não encontrado para os parâmetros informados'
+                  data:
+                    type: string
+                    example: null
+        422:
+          description: ''
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: '{"success": false, "message": "Erro de validação dos parâmetros do cupom", "data": {...}}'
+        500:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: 'Erro ao consultar cupom'
+                  data: null
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: 'Erro ao consultar cupom'
+                  data:
+                    type: string
+                    example: null
+      tags:
+        - 'Cupom Digital'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nroempresa:
+                  type: integer
+                  description: ''
+                  example: 16
+                  nullable: false
+                nrocheckout:
+                  type: integer
+                  description: ''
+                  example: 16
+                  nullable: false
+                coo:
+                  type: integer
+                  description: ''
+                  example: 16
+                  nullable: false
+              required:
+                - nroempresa
+                - nrocheckout
+                - coo
+      security: []
   /api/tokens:
     get:
       summary: ''
@@ -77,7 +203,7 @@ paths:
                 expires_at:
                   type: string
                   description: 'Must be a valid date. Must be a date after <code>now</code>.'
-                  example: '2052-04-06'
+                  example: '2052-04-07'
                   nullable: true
                 ip_restriction:
                   type: string
@@ -157,7 +283,7 @@ paths:
                 expires_at:
                   type: string
                   description: 'Must be a valid date. Must be a date after <code>now</code>.'
-                  example: '2052-04-06'
+                  example: '2052-04-07'
                   nullable: true
                 is_active:
                   type: boolean

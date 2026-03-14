@@ -66,6 +66,16 @@
                     <a href="#authenticating-requests">Authenticating requests</a>
                 </li>
                             </ul>
+                    <ul id="tocify-header-cupom-digital" class="tocify-header">
+                <li class="tocify-item level-1" data-unique="cupom-digital">
+                    <a href="#cupom-digital">Cupom Digital</a>
+                </li>
+                                    <ul id="tocify-subheader-cupom-digital" class="tocify-subheader">
+                                                    <li class="tocify-item level-2" data-unique="cupom-digital-GETapi-v1-cupom">
+                                <a href="#cupom-digital-GETapi-v1-cupom">Consulta os dados completos de um cupom fiscal (itens e cliente)</a>
+                            </li>
+                                                                        </ul>
+                            </ul>
                     <ul id="tocify-header-endpoints" class="tocify-header">
                 <li class="tocify-item level-1" data-unique="endpoints">
                     <a href="#endpoints">Endpoints</a>
@@ -135,13 +145,13 @@
             </div>
 
     <ul class="toc-footer" id="toc-footer">
-                    <li style="padding-bottom: 5px;"><a href="{{ url('/docs.postman') }}">View Postman collection</a></li>
-                            <li style="padding-bottom: 5px;"><a href="{{ url('/docs.openapi') }}">View OpenAPI spec</a></li>
+                    <li style="padding-bottom: 5px;"><a href="{{ route("scribe.postman") }}">View Postman collection</a></li>
+                            <li style="padding-bottom: 5px;"><a href="{{ route("scribe.openapi") }}">View OpenAPI spec</a></li>
                 <li><a href="http://github.com/knuckleswtf/scribe">Documentation powered by Scribe ✍</a></li>
     </ul>
 
     <ul class="toc-footer" id="last-updated">
-        <li>Last updated: March 13, 2026</li>
+        <li>Last updated: March 14, 2026</li>
     </ul>
 </div>
 
@@ -160,7 +170,244 @@ You can switch the language used with the tabs at the top right (or from the nav
         <h1 id="authenticating-requests">Authenticating requests</h1>
 <p>This API is not authenticated.</p>
 
-        <h1 id="endpoints">Endpoints</h1>
+        <h1 id="cupom-digital">Cupom Digital</h1>
+
+    
+
+                                <h2 id="cupom-digital-GETapi-v1-cupom">Consulta os dados completos de um cupom fiscal (itens e cliente)</h2>
+
+<p>
+</p>
+
+
+
+<span id="example-requests-GETapi-v1-cupom">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request GET \
+    --get "http://127.0.0.1/api/v1/cupom?nroempresa=2&amp;nrocheckout=11&amp;coo=377249" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json" \
+    --data "{
+    \"nroempresa\": 16,
+    \"nrocheckout\": 16,
+    \"coo\": 16
+}"
+</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://127.0.0.1/api/v1/cupom"
+);
+
+const params = {
+    "nroempresa": "2",
+    "nrocheckout": "11",
+    "coo": "377249",
+};
+Object.keys(params)
+    .forEach(key =&gt; url.searchParams.append(key, params[key]));
+
+const headers = {
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+let body = {
+    "nroempresa": 16,
+    "nrocheckout": 16,
+    "coo": 16
+};
+
+fetch(url, {
+    method: "GET",
+    headers,
+    body: JSON.stringify(body),
+}).then(response =&gt; response.json());</code></pre></div>
+
+</span>
+
+<span id="example-responses-GETapi-v1-cupom">
+            <blockquote>
+            <p>Example response (200):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{&quot;success&quot;: true, &quot;message&quot;: &quot;Cupom recuperado com sucesso&quot;, &quot;data&quot;: {&quot;seqdocto&quot;: 1120147, &quot;itens&quot;: [...], &quot;cliente&quot;: {...}}}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (404):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;success&quot;: false,
+    &quot;message&quot;: &quot;Cupom n&atilde;o encontrado para os par&acirc;metros informados&quot;,
+    &quot;data&quot;: null
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (422):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{&quot;success&quot;: false, &quot;message&quot;: &quot;Erro de valida&ccedil;&atilde;o dos par&acirc;metros do cupom&quot;, &quot;data&quot;: {...}}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (500):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;success&quot;: false,
+    &quot;message&quot;: &quot;Erro ao consultar cupom&quot;,
+    &quot;data&quot;: null
+}</code>
+ </pre>
+    </span>
+<span id="execution-results-GETapi-v1-cupom" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-GETapi-v1-cupom"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-GETapi-v1-cupom"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-GETapi-v1-cupom" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-GETapi-v1-cupom">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-GETapi-v1-cupom" data-method="GET"
+      data-path="api/v1/cupom"
+      data-authed="0"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('GETapi-v1-cupom', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-GETapi-v1-cupom"
+                    onclick="tryItOut('GETapi-v1-cupom');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-GETapi-v1-cupom"
+                    onclick="cancelTryOut('GETapi-v1-cupom');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-GETapi-v1-cupom"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-green">GET</small>
+            <b><code>api/v1/cupom</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="GETapi-v1-cupom"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="GETapi-v1-cupom"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                            <h4 class="fancy-heading-panel"><b>Query Parameters</b></h4>
+                                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>nroempresa</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="nroempresa"                data-endpoint="GETapi-v1-cupom"
+               value="2"
+               data-component="query">
+    <br>
+<p>Número da empresa. Example: <code>2</code></p>
+            </div>
+                                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>nrocheckout</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="nrocheckout"                data-endpoint="GETapi-v1-cupom"
+               value="11"
+               data-component="query">
+    <br>
+<p>Número do checkout. Example: <code>11</code></p>
+            </div>
+                                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>coo</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="coo"                data-endpoint="GETapi-v1-cupom"
+               value="377249"
+               data-component="query">
+    <br>
+<p>Contador de Ordem de Operação. Example: <code>377249</code></p>
+            </div>
+                        <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>nroempresa</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="nroempresa"                data-endpoint="GETapi-v1-cupom"
+               value="16"
+               data-component="body">
+    <br>
+<p>Example: <code>16</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>nrocheckout</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="nrocheckout"                data-endpoint="GETapi-v1-cupom"
+               value="16"
+               data-component="body">
+    <br>
+<p>Example: <code>16</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>coo</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="coo"                data-endpoint="GETapi-v1-cupom"
+               value="16"
+               data-component="body">
+    <br>
+<p>Example: <code>16</code></p>
+        </div>
+        </form>
+
+                <h1 id="endpoints">Endpoints</h1>
 
     
 
@@ -313,7 +560,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
     \"abilities\": [
         \"architecto\"
     ],
-    \"expires_at\": \"2052-04-06\",
+    \"expires_at\": \"2052-04-07\",
     \"ip_restriction\": \"1.102.226.211\",
     \"rate_limit\": 7
 }"
@@ -335,7 +582,7 @@ let body = {
     "abilities": [
         "architecto"
     ],
-    "expires_at": "2052-04-06",
+    "expires_at": "2052-04-07",
     "ip_restriction": "1.102.226.211",
     "rate_limit": 7
 };
@@ -450,10 +697,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <i>optional</i> &nbsp;
                 <input type="text" style="display: none"
                               name="expires_at"                data-endpoint="POSTapi-tokens"
-               value="2052-04-06"
+               value="2052-04-07"
                data-component="body">
     <br>
-<p>Must be a valid date. Must be a date after <code>now</code>. Example: <code>2052-04-06</code></p>
+<p>Must be a valid date. Must be a date after <code>now</code>. Example: <code>2052-04-07</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>ip_restriction</code></b>&nbsp;&nbsp;
@@ -648,7 +895,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
     --header "Accept: application/json" \
     --data "{
     \"name\": \"b\",
-    \"expires_at\": \"2052-04-06\",
+    \"expires_at\": \"2052-04-07\",
     \"is_active\": false,
     \"ip_restriction\": \"1.102.226.211\",
     \"rate_limit\": 7
@@ -668,7 +915,7 @@ const headers = {
 
 let body = {
     "name": "b",
-    "expires_at": "2052-04-06",
+    "expires_at": "2052-04-07",
     "is_active": false,
     "ip_restriction": "1.102.226.211",
     "rate_limit": 7
@@ -794,10 +1041,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <i>optional</i> &nbsp;
                 <input type="text" style="display: none"
                               name="expires_at"                data-endpoint="PUTapi-tokens--id-"
-               value="2052-04-06"
+               value="2052-04-07"
                data-component="body">
     <br>
-<p>Must be a valid date. Must be a date after <code>now</code>. Example: <code>2052-04-06</code></p>
+<p>Must be a valid date. Must be a date after <code>now</code>. Example: <code>2052-04-07</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>is_active</code></b>&nbsp;&nbsp;

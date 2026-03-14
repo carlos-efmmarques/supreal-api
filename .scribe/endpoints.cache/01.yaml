@@ -29,8 +29,8 @@ endpoints:
     fileParameters: []
     responses:
       -
-        status: 200
-        content: '{"success":true,"message":"Tokens listados com sucesso","data":{"items":[{"id":1,"name":"Token de Teste","abilities":["*"],"last_used_at":"2025-08-14T20:56:22.000000Z","expires_at":null,"is_active":true,"created_at":"2025-08-14T20:56:16.000000Z"}],"pagination":{"total":1,"per_page":20,"current_page":1,"last_page":1,"from":1,"to":1,"next_page_url":null,"prev_page_url":null}}}'
+        status: 401
+        content: '{"success":false,"message":"Chave mestra n\u00e3o fornecida. Use o header X-Master-Key.","data":null}'
         headers:
           cache-control: 'no-cache, private'
           content-type: application/json
@@ -92,7 +92,7 @@ endpoints:
         name: expires_at
         description: 'Must be a valid date. Must be a date after <code>now</code>.'
         required: false
-        example: '2051-09-08'
+        example: '2052-04-07'
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -132,7 +132,7 @@ endpoints:
       name: b
       abilities:
         - architecto
-      expires_at: '2051-09-08'
+      expires_at: '2052-04-07'
       ip_restriction: 1.102.226.211
       rate_limit: 7
     fileParameters: []
@@ -180,8 +180,8 @@ endpoints:
     fileParameters: []
     responses:
       -
-        status: 404
-        content: '{"success":false,"message":"Token n\u00e3o encontrado","data":null}'
+        status: 401
+        content: '{"success":false,"message":"Chave mestra n\u00e3o fornecida. Use o header X-Master-Key.","data":null}'
         headers:
           cache-control: 'no-cache, private'
           content-type: application/json
@@ -253,7 +253,7 @@ endpoints:
         name: expires_at
         description: 'Must be a valid date. Must be a date after <code>now</code>.'
         required: false
-        example: '2051-09-08'
+        example: '2052-04-07'
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -301,7 +301,7 @@ endpoints:
         custom: []
     cleanBodyParameters:
       name: b
-      expires_at: '2051-09-08'
+      expires_at: '2052-04-07'
       is_active: false
       ip_restriction: 1.102.226.211
       rate_limit: 7

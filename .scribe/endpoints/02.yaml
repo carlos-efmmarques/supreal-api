@@ -10,7 +10,7 @@ endpoints:
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: 'Insere um pedido no ERP Oracle usando a procedure sp_inserePedidoSitemercado'
+      title: 'Insere um pedido no ERP Oracle usando a procedure SP_INSEREPEDIDOSITEMERCADO'
       description: ''
       authenticated: false
       deprecated: false
@@ -293,26 +293,6 @@ endpoints:
         exampleWasSpecified: true
         nullable: false
         custom: []
-      nroformapagto:
-        name: nroformapagto
-        description: 'Forma de pagamento.'
-        required: true
-        example: 1
-        type: integer
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        custom: []
-      usuinclusao:
-        name: usuinclusao
-        description: 'Usuário de inclusão.'
-        required: true
-        example: API_SITEMERCADO
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        custom: []
       nroparcelas:
         name: nroparcelas
         description: 'Número de parcelas.'
@@ -371,8 +351,6 @@ endpoints:
       dtapedidoafv: '2025-01-14'
       vlrtotfrete: 15.5
       valor: 150.75
-      nroformapagto: 1
-      usuinclusao: API_SITEMERCADO
       nroparcelas: 1
       codoperadoracartao: 1
       nrocartao: '****1234'
