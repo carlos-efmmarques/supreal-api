@@ -59,7 +59,7 @@ class CupomController extends BaseController
 
             // 1. Buscar o seqdocto
             $stmtDocto = $pdo->prepare("
-                SELECT seqdocto
+                SELECT max(seqdocto) as seqdocto
                 FROM consincomonitor.TB_DOCTO
                 WHERE NROEMPRESA = :nroempresa
                   AND NROCHECKOUT = :nrocheckout
