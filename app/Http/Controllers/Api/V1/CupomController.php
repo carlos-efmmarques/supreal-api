@@ -100,6 +100,7 @@ class CupomController extends BaseController
                   AND td.NROEMPRESA = :nroempresa
                   AND td.NROCHECKOUT = :nrocheckout
                   AND td.SEQDOCTO = :seqdocto
+                  AND td.STATUS = 'V'
             ");
             $stmtItens->execute([
                 'nroempresa' => $nroempresa,
