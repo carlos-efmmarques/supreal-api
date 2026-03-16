@@ -297,4 +297,46 @@ class SiteMercadoController extends BaseController
             return $this->serverError('Erro ao inserir item no ERP: ' . $e->getMessage());
         }
     }
+
+    /**
+     * Consulta o número do pedido de venda gerado pelo ERP a partir do nropedidoafv
+     *
+     * @group Site Mercado
+     * @urlParam nropedidoafv string required Número do pedido AFV. Example: 5319
+     * @response 200 {"success": true, "data": {"nropedidoafv": "5319", "nropedvenda": 234234, "seqedipedvenda": 12345}}
+     * @response 404 {"success": false, "message": "Pedido não encontrado no ERP"}
+     */
+    public function consultaPedido(string $nropedidoafv): JsonResponse
+    {
+        try {
+            $pdo = $this->getOraclePdo();
+
+            // Buscar na tabela edi_pedvenda o nropedvenda gerado pelo ERP
+            $sql = "SELECT ep.nropedidoafv, ep.seqedipedvenda, ep.nropedvenda
+                    FROM consinco.edi_pedvenda ep
+                    WHERE ep.nropedidoafv = :nropedidoafv";
+
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute(['nropedidoafv' => $nropedidoafv]);
+            $result = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+            if (!$result) {
+                return $this->notFound('Pedido não encontrado no ERP');
+            }
+
+            return $this->success([
+                'nropedidoafv' => $result['NROPEDIDOAFV'],
+                'nropedvenda' => (int) $result['NROPEDVENDA'],
+                'seqedipedvenda' => (int) $result['SEQEDIPEDVENDA'],
+            ], 'Pedido encontrado');
+
+        } catch (Exception $e) {
+            Log::error('SiteMercado: Erro ao consultar pedido', [
+                'nropedidoafv' => $nropedidoafv,
+                'error' => $e->getMessage()
+            ]);
+
+            return $this->serverError('Erro ao consultar pedido no ERP: ' . $e->getMessage());
+        }
+    }
 }
