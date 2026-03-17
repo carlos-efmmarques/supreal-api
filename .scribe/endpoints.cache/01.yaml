@@ -92,7 +92,7 @@ endpoints:
         name: expires_at
         description: 'Must be a valid date. Must be a date after <code>now</code>.'
         required: false
-        example: '2052-04-07'
+        example: '2052-04-10'
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -132,7 +132,7 @@ endpoints:
       name: b
       abilities:
         - architecto
-      expires_at: '2052-04-07'
+      expires_at: '2052-04-10'
       ip_restriction: 1.102.226.211
       rate_limit: 7
     fileParameters: []
@@ -253,7 +253,7 @@ endpoints:
         name: expires_at
         description: 'Must be a valid date. Must be a date after <code>now</code>.'
         required: false
-        example: '2052-04-07'
+        example: '2052-04-10'
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -301,7 +301,7 @@ endpoints:
         custom: []
     cleanBodyParameters:
       name: b
-      expires_at: '2052-04-07'
+      expires_at: '2052-04-10'
       is_active: false
       ip_restriction: 1.102.226.211
       rate_limit: 7

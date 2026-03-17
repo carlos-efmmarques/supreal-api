@@ -385,13 +385,13 @@ endpoints:
   -
     httpMethods:
       - POST
-    uri: api/v1/site-mercado/itens
+    uri: api/v1/site-mercado/itens/batch
     metadata:
       groupName: 'Site Mercado'
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: 'Insere itens de um pedido no ERP Oracle usando a procedure sp_insereItensSitemercado'
+      title: 'Insere múltiplos itens de um pedido no ERP em uma única transação'
       description: ''
       authenticated: false
       deprecated: false
@@ -406,17 +406,28 @@ endpoints:
     bodyParameters:
       nropedidoafv:
         name: nropedidoafv
-        description: 'Número do pedido AFV (usado como referência).'
+        description: 'Número do pedido AFV.'
         required: true
-        example: PED123456
+        example: '5389'
         type: string
         enumValues: []
         exampleWasSpecified: true
         nullable: false
         custom: []
-      seqpedvendaitem:
-        name: seqpedvendaitem
-        description: 'Sequência do item no pedido.'
+      itens:
+        name: itens
+        description: 'Array de itens do pedido.'
+        required: true
+        example:
+          - architecto
+        type: 'string[]'
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      'itens.*.seqpedvendaitem':
+        name: 'itens.*.seqpedvendaitem'
+        description: 'Sequência do item.'
         required: true
         example: 1
         type: integer
@@ -424,38 +435,38 @@ endpoints:
         exampleWasSpecified: true
         nullable: false
         custom: []
-      codacesso:
-        name: codacesso
-        description: 'Código de acesso do produto.'
+      'itens.*.codacesso':
+        name: 'itens.*.codacesso'
+        description: 'Código de acesso.'
         required: true
-        example: COD12345
+        example: '28820'
         type: string
         enumValues: []
         exampleWasSpecified: true
         nullable: false
         custom: []
-      seqproduto:
-        name: seqproduto
+      'itens.*.seqproduto':
+        name: 'itens.*.seqproduto'
         description: 'Sequência do produto.'
         required: true
-        example: 12345
+        example: 28820
         type: integer
         enumValues: []
         exampleWasSpecified: true
         nullable: false
         custom: []
-      qtdpedida:
-        name: qtdpedida
+      'itens.*.qtdpedida':
+        name: 'itens.*.qtdpedida'
         description: 'Quantidade pedida.'
         required: true
-        example: 2.5
+        example: 2.0
         type: number
         enumValues: []
         exampleWasSpecified: true
         nullable: false
         custom: []
-      qtdembalagem:
-        name: qtdembalagem
+      'itens.*.qtdembalagem':
+        name: 'itens.*.qtdembalagem'
         description: 'Quantidade da embalagem.'
         required: true
         example: 1.0
@@ -464,52 +475,154 @@ endpoints:
         exampleWasSpecified: true
         nullable: false
         custom: []
-      vlrembtabpreco:
-        name: vlrembtabpreco
-        description: 'Valor da embalagem tabela preço.'
+      'itens.*.vlrembtabpreco':
+        name: 'itens.*.vlrembtabpreco'
+        description: 'Preço unitário.'
         required: true
-        example: 15.9
+        example: 6.99
         type: number
         enumValues: []
         exampleWasSpecified: true
         nullable: false
         custom: []
-      vlrembinformado:
-        name: vlrembinformado
-        description: 'Valor da embalagem informado.'
+      'itens.*.vlrembinformado':
+        name: 'itens.*.vlrembinformado'
+        description: 'Preço informado.'
         required: true
-        example: 15.9
+        example: 6.99
         type: number
         enumValues: []
         exampleWasSpecified: true
         nullable: false
         custom: []
     cleanBodyParameters:
-      nropedidoafv: PED123456
-      seqpedvendaitem: 1
-      codacesso: COD12345
-      seqproduto: 12345
-      qtdpedida: 2.5
-      qtdembalagem: 1.0
-      vlrembtabpreco: 15.9
-      vlrembinformado: 15.9
+      nropedidoafv: '5389'
+      itens:
+        - architecto
     fileParameters: []
     responses:
       -
         status: 201
-        content: '{"success": true, "message": "Item inserido com sucesso no ERP", "data": {"nropedidoafv": "PED123456", "seqpedvendaitem": 1}}'
+        content: '{"success": true, "message": "48 itens inseridos com sucesso", "data": {"nropedidoafv": "5389", "total_itens": 48, "inseridos": 48, "erros": 0}}'
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - GET
+    uri: 'api/v1/site-mercado/pedidos/{nropedidoafv}'
+    metadata:
+      groupName: 'Site Mercado'
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Consulta o número do pedido de venda gerado pelo ERP a partir do nropedidoafv'
+      description: ''
+      authenticated: false
+      deprecated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      nropedidoafv:
+        name: nropedidoafv
+        description: 'Número do pedido AFV.'
+        required: true
+        example: '5319'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+    cleanUrlParameters:
+      nropedidoafv: '5319'
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: '{"success": true, "data": {"nropedidoafv": "5319", "nropedvenda": 234234, "seqedipedvenda": 12345}}'
         headers: []
         description: ''
         custom: []
       -
-        status: 422
-        content: '{"success": false, "message": "Erro de validação", "data": {...}}'
+        status: 404
+        content: '{"success": false, "message": "Pedido não encontrado no ERP"}'
         headers: []
         description: ''
         custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - POST
+    uri: api/v1/site-mercado/produtos/categorias
+    metadata:
+      groupName: 'Site Mercado'
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Consulta categorias de produtos pelo codigo_interno'
+      description: ''
+      authenticated: false
+      deprecated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      codigos:
+        name: codigos
+        description: 'Lista de codigos internos.'
+        required: true
+        example:
+          - 25973
+          - 28820
+          - 950
+        type: 'string[]'
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      id_loja:
+        name: id_loja
+        description: 'ID da loja.'
+        required: true
+        example: 2
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+    cleanBodyParameters:
+      codigos:
+        - 25973
+        - 28820
+        - 950
+      id_loja: 2
+    fileParameters: []
+    responses:
       -
-        status: 500
-        content: '{"success": false, "message": "Erro ao inserir item no ERP", "data": {"error": "..."}}'
+        status: 200
+        content: '{"success": true, "data": {"25973": {"departamento": "CONSERVAS", "categoria": "CONDIMENTOS", "subcategoria": "CALDOS"}}}'
         headers: []
         description: ''
         custom: []

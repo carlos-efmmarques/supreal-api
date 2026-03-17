@@ -467,4 +467,64 @@ class SiteMercadoController extends BaseController
             return $this->serverError('Erro ao consultar pedido no ERP: ' . $e->getMessage());
         }
     }
+
+    /**
+     * Consulta categorias de produtos pelo codigo_interno
+     *
+     * @group Site Mercado
+     * @bodyParam codigos array required Lista de codigos internos. Example: [25973, 28820, 950]
+     * @bodyParam id_loja integer required ID da loja. Example: 2
+     * @response 200 {"success": true, "data": {"25973": {"departamento": "CONSERVAS", "categoria": "CONDIMENTOS", "subcategoria": "CALDOS"}}}
+     */
+    public function consultaCategorias(\Illuminate\Http\Request $request): JsonResponse
+    {
+        try {
+            $request->validate([
+                'codigos' => 'required|array|min:1',
+                'codigos.*' => 'required|integer',
+                'id_loja' => 'required|integer',
+            ]);
+
+            $codigos = $request->codigos;
+            $idLoja = $request->id_loja;
+
+            $placeholders = implode(',', array_fill(0, count($codigos), '?'));
+
+            $sql = "SELECT yp.codigo_interno,
+                c1.DESCRICAO as subcategoria,
+                c2.DESCRICAO as categoria,
+                c3.DESCRICAO as departamento
+            FROM consinco.YANDEH_PRODUTO yp
+            LEFT JOIN consinco.YANDEH_CATEGORIA c1 ON c1.ID = yp.categorias AND c1.ID_LOJA = yp.id_loja
+            LEFT JOIN consinco.YANDEH_CATEGORIA c2 ON c2.ID = c1.ID_CATEGORIA_PAI AND c2.ID_LOJA = yp.id_loja
+            LEFT JOIN consinco.YANDEH_CATEGORIA c3 ON c3.ID = c2.ID_CATEGORIA_PAI AND c3.ID_LOJA = yp.id_loja
+            WHERE yp.codigo_interno IN ($placeholders)
+            AND yp.id_loja = ?";
+
+            $bindings = array_merge($codigos, [$idLoja]);
+
+            $pdo = $this->getOraclePdo();
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute($bindings);
+            $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+            $result = [];
+            foreach ($rows as $row) {
+                $result[$row['CODIGO_INTERNO']] = [
+                    'departamento' => $row['DEPARTAMENTO'] ?? 'OUTROS',
+                    'categoria' => $row['CATEGORIA'] ?? null,
+                    'subcategoria' => $row['SUBCATEGORIA'] ?? null,
+                ];
+            }
+
+            return $this->success($result, count($result) . ' produtos com categoria encontrados');
+
+        } catch (Exception $e) {
+            Log::error('SiteMercado: Erro ao consultar categorias', [
+                'error' => $e->getMessage()
+            ]);
+
+            return $this->serverError('Erro ao consultar categorias: ' . $e->getMessage());
+        }
+    }
 }

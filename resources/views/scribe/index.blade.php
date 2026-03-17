@@ -137,8 +137,14 @@
                                                     <li class="tocify-item level-2" data-unique="site-mercado-POSTapi-v1-site-mercado-pedidos">
                                 <a href="#site-mercado-POSTapi-v1-site-mercado-pedidos">Insere um pedido no ERP Oracle usando a procedure SP_INSEREPEDIDOSITEMERCADO</a>
                             </li>
-                                                                                <li class="tocify-item level-2" data-unique="site-mercado-POSTapi-v1-site-mercado-itens">
-                                <a href="#site-mercado-POSTapi-v1-site-mercado-itens">Insere itens de um pedido no ERP Oracle usando a procedure sp_insereItensSitemercado</a>
+                                                                                <li class="tocify-item level-2" data-unique="site-mercado-POSTapi-v1-site-mercado-itens-batch">
+                                <a href="#site-mercado-POSTapi-v1-site-mercado-itens-batch">Insere múltiplos itens de um pedido no ERP em uma única transação</a>
+                            </li>
+                                                                                <li class="tocify-item level-2" data-unique="site-mercado-GETapi-v1-site-mercado-pedidos--nropedidoafv-">
+                                <a href="#site-mercado-GETapi-v1-site-mercado-pedidos--nropedidoafv-">Consulta o número do pedido de venda gerado pelo ERP a partir do nropedidoafv</a>
+                            </li>
+                                                                                <li class="tocify-item level-2" data-unique="site-mercado-POSTapi-v1-site-mercado-produtos-categorias">
+                                <a href="#site-mercado-POSTapi-v1-site-mercado-produtos-categorias">Consulta categorias de produtos pelo codigo_interno</a>
                             </li>
                                                                         </ul>
                             </ul>
@@ -151,7 +157,7 @@
     </ul>
 
     <ul class="toc-footer" id="last-updated">
-        <li>Last updated: March 14, 2026</li>
+        <li>Last updated: March 17, 2026</li>
     </ul>
 </div>
 
@@ -681,7 +687,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
     \"abilities\": [
         \"architecto\"
     ],
-    \"expires_at\": \"2052-04-07\",
+    \"expires_at\": \"2052-04-10\",
     \"ip_restriction\": \"1.102.226.211\",
     \"rate_limit\": 7
 }"
@@ -703,7 +709,7 @@ let body = {
     "abilities": [
         "architecto"
     ],
-    "expires_at": "2052-04-07",
+    "expires_at": "2052-04-10",
     "ip_restriction": "1.102.226.211",
     "rate_limit": 7
 };
@@ -818,10 +824,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <i>optional</i> &nbsp;
                 <input type="text" style="display: none"
                               name="expires_at"                data-endpoint="POSTapi-tokens"
-               value="2052-04-07"
+               value="2052-04-10"
                data-component="body">
     <br>
-<p>Must be a valid date. Must be a date after <code>now</code>. Example: <code>2052-04-07</code></p>
+<p>Must be a valid date. Must be a date after <code>now</code>. Example: <code>2052-04-10</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>ip_restriction</code></b>&nbsp;&nbsp;
@@ -1016,7 +1022,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
     --header "Accept: application/json" \
     --data "{
     \"name\": \"b\",
-    \"expires_at\": \"2052-04-07\",
+    \"expires_at\": \"2052-04-10\",
     \"is_active\": false,
     \"ip_restriction\": \"1.102.226.211\",
     \"rate_limit\": 7
@@ -1036,7 +1042,7 @@ const headers = {
 
 let body = {
     "name": "b",
-    "expires_at": "2052-04-07",
+    "expires_at": "2052-04-10",
     "is_active": false,
     "ip_restriction": "1.102.226.211",
     "rate_limit": 7
@@ -1162,10 +1168,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <i>optional</i> &nbsp;
                 <input type="text" style="display: none"
                               name="expires_at"                data-endpoint="PUTapi-tokens--id-"
-               value="2052-04-07"
+               value="2052-04-10"
                data-component="body">
     <br>
-<p>Must be a valid date. Must be a date after <code>now</code>. Example: <code>2052-04-07</code></p>
+<p>Must be a valid date. Must be a date after <code>now</code>. Example: <code>2052-04-10</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>is_active</code></b>&nbsp;&nbsp;
@@ -3063,38 +3069,34 @@ You can check the Dev Tools console for debugging information.</code></pre>
         </div>
         </form>
 
-                    <h2 id="site-mercado-POSTapi-v1-site-mercado-itens">Insere itens de um pedido no ERP Oracle usando a procedure sp_insereItensSitemercado</h2>
+                    <h2 id="site-mercado-POSTapi-v1-site-mercado-itens-batch">Insere múltiplos itens de um pedido no ERP em uma única transação</h2>
 
 <p>
 </p>
 
 
 
-<span id="example-requests-POSTapi-v1-site-mercado-itens">
+<span id="example-requests-POSTapi-v1-site-mercado-itens-batch">
 <blockquote>Example request:</blockquote>
 
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request POST \
-    "http://127.0.0.1/api/v1/site-mercado/itens" \
+    "http://127.0.0.1/api/v1/site-mercado/itens/batch" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
     --data "{
-    \"nropedidoafv\": \"PED123456\",
-    \"seqpedvendaitem\": 1,
-    \"codacesso\": \"COD12345\",
-    \"seqproduto\": 12345,
-    \"qtdpedida\": 2.5,
-    \"qtdembalagem\": 1,
-    \"vlrembtabpreco\": 15.9,
-    \"vlrembinformado\": 15.9
+    \"nropedidoafv\": \"5389\",
+    \"itens\": [
+        \"architecto\"
+    ]
 }"
 </code></pre></div>
 
 
 <div class="javascript-example">
     <pre><code class="language-javascript">const url = new URL(
-    "http://127.0.0.1/api/v1/site-mercado/itens"
+    "http://127.0.0.1/api/v1/site-mercado/itens/batch"
 );
 
 const headers = {
@@ -3103,14 +3105,10 @@ const headers = {
 };
 
 let body = {
-    "nropedidoafv": "PED123456",
-    "seqpedvendaitem": 1,
-    "codacesso": "COD12345",
-    "seqproduto": 12345,
-    "qtdpedida": 2.5,
-    "qtdembalagem": 1,
-    "vlrembtabpreco": 15.9,
-    "vlrembinformado": 15.9
+    "nropedidoafv": "5389",
+    "itens": [
+        "architecto"
+    ]
 };
 
 fetch(url, {
@@ -3121,7 +3119,7 @@ fetch(url, {
 
 </span>
 
-<span id="example-responses-POSTapi-v1-site-mercado-itens">
+<span id="example-responses-POSTapi-v1-site-mercado-itens-batch">
             <blockquote>
             <p>Example response (201):</p>
         </blockquote>
@@ -3129,71 +3127,53 @@ fetch(url, {
 
 <code class="language-json" style="max-height: 300px;">{
     &quot;success&quot;: true,
-    &quot;message&quot;: &quot;Item inserido com sucesso no ERP&quot;,
+    &quot;message&quot;: &quot;48 itens inseridos com sucesso&quot;,
     &quot;data&quot;: {
-        &quot;nropedidoafv&quot;: &quot;PED123456&quot;,
-        &quot;seqpedvendaitem&quot;: 1
-    }
-}</code>
- </pre>
-            <blockquote>
-            <p>Example response (422):</p>
-        </blockquote>
-                <pre>
-
-<code class="language-json" style="max-height: 300px;">{&quot;success&quot;: false, &quot;message&quot;: &quot;Erro de valida&ccedil;&atilde;o&quot;, &quot;data&quot;: {...}}</code>
- </pre>
-            <blockquote>
-            <p>Example response (500):</p>
-        </blockquote>
-                <pre>
-
-<code class="language-json" style="max-height: 300px;">{
-    &quot;success&quot;: false,
-    &quot;message&quot;: &quot;Erro ao inserir item no ERP&quot;,
-    &quot;data&quot;: {
-        &quot;error&quot;: &quot;...&quot;
+        &quot;nropedidoafv&quot;: &quot;5389&quot;,
+        &quot;total_itens&quot;: 48,
+        &quot;inseridos&quot;: 48,
+        &quot;erros&quot;: 0
     }
 }</code>
  </pre>
     </span>
-<span id="execution-results-POSTapi-v1-site-mercado-itens" hidden>
+<span id="execution-results-POSTapi-v1-site-mercado-itens-batch" hidden>
     <blockquote>Received response<span
-                id="execution-response-status-POSTapi-v1-site-mercado-itens"></span>:
+                id="execution-response-status-POSTapi-v1-site-mercado-itens-batch"></span>:
     </blockquote>
-    <pre class="json"><code id="execution-response-content-POSTapi-v1-site-mercado-itens"
+    <pre class="json"><code id="execution-response-content-POSTapi-v1-site-mercado-itens-batch"
       data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
 </span>
-<span id="execution-error-POSTapi-v1-site-mercado-itens" hidden>
+<span id="execution-error-POSTapi-v1-site-mercado-itens-batch" hidden>
     <blockquote>Request failed with error:</blockquote>
-    <pre><code id="execution-error-message-POSTapi-v1-site-mercado-itens">
+    <pre><code id="execution-error-message-POSTapi-v1-site-mercado-itens-batch">
 
 Tip: Check that you&#039;re properly connected to the network.
 If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
 You can check the Dev Tools console for debugging information.</code></pre>
 </span>
-<form id="form-POSTapi-v1-site-mercado-itens" data-method="POST"
-      data-path="api/v1/site-mercado/itens"
+<form id="form-POSTapi-v1-site-mercado-itens-batch" data-method="POST"
+      data-path="api/v1/site-mercado/itens/batch"
       data-authed="0"
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
-      onsubmit="event.preventDefault(); executeTryOut('POSTapi-v1-site-mercado-itens', this);">
+      onsubmit="event.preventDefault(); executeTryOut('POSTapi-v1-site-mercado-itens-batch', this);">
     <h3>
         Request&nbsp;&nbsp;&nbsp;
                     <button type="button"
                     style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
-                    id="btn-tryout-POSTapi-v1-site-mercado-itens"
-                    onclick="tryItOut('POSTapi-v1-site-mercado-itens');">Try it out ⚡
+                    id="btn-tryout-POSTapi-v1-site-mercado-itens-batch"
+                    onclick="tryItOut('POSTapi-v1-site-mercado-itens-batch');">Try it out ⚡
             </button>
             <button type="button"
                     style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
-                    id="btn-canceltryout-POSTapi-v1-site-mercado-itens"
-                    onclick="cancelTryOut('POSTapi-v1-site-mercado-itens');" hidden>Cancel 🛑
+                    id="btn-canceltryout-POSTapi-v1-site-mercado-itens-batch"
+                    onclick="cancelTryOut('POSTapi-v1-site-mercado-itens-batch');" hidden>Cancel 🛑
             </button>&nbsp;&nbsp;
             <button type="submit"
                     style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
-                    id="btn-executetryout-POSTapi-v1-site-mercado-itens"
+                    id="btn-executetryout-POSTapi-v1-site-mercado-itens-batch"
                     data-initial-text="Send Request 💥"
                     data-loading-text="⏱ Sending..."
                     hidden>Send Request 💥
@@ -3201,7 +3181,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
             </h3>
             <p>
             <small class="badge badge-black">POST</small>
-            <b><code>api/v1/site-mercado/itens</code></b>
+            <b><code>api/v1/site-mercado/itens/batch</code></b>
         </p>
                 <h4 class="fancy-heading-panel"><b>Headers</b></h4>
                                 <div style="padding-left: 28px; clear: unset;">
@@ -3209,7 +3189,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 &nbsp;
  &nbsp;
                 <input type="text" style="display: none"
-                              name="Content-Type"                data-endpoint="POSTapi-v1-site-mercado-itens"
+                              name="Content-Type"                data-endpoint="POSTapi-v1-site-mercado-itens-batch"
                value="application/json"
                data-component="header">
     <br>
@@ -3220,7 +3200,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 &nbsp;
  &nbsp;
                 <input type="text" style="display: none"
-                              name="Accept"                data-endpoint="POSTapi-v1-site-mercado-itens"
+                              name="Accept"                data-endpoint="POSTapi-v1-site-mercado-itens-batch"
                value="application/json"
                data-component="header">
     <br>
@@ -3232,88 +3212,422 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <small>string</small>&nbsp;
  &nbsp;
                 <input type="text" style="display: none"
-                              name="nropedidoafv"                data-endpoint="POSTapi-v1-site-mercado-itens"
-               value="PED123456"
+                              name="nropedidoafv"                data-endpoint="POSTapi-v1-site-mercado-itens-batch"
+               value="5389"
                data-component="body">
     <br>
-<p>Número do pedido AFV (usado como referência). Example: <code>PED123456</code></p>
+<p>Número do pedido AFV. Example: <code>5389</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
-            <b style="line-height: 2;"><code>seqpedvendaitem</code></b>&nbsp;&nbsp;
+        <details>
+            <summary style="padding-bottom: 10px;">
+                <b style="line-height: 2;"><code>itens</code></b>&nbsp;&nbsp;
+<small>string[]</small>&nbsp;
+ &nbsp;
+<br>
+<p>Array de itens do pedido.</p>
+            </summary>
+                                                <div style=" margin-left: 14px; clear: unset;">
+        <details>
+            <summary style="padding-bottom: 10px;">
+                <b style="line-height: 2;"><code>*</code></b>&nbsp;&nbsp;
+<small>object</small>&nbsp;
+<i>optional</i> &nbsp;
+<br>
+
+            </summary>
+                                                <div style="margin-left: 28px; clear: unset;">
+                        <b style="line-height: 2;"><code>seqpedvendaitem</code></b>&nbsp;&nbsp;
 <small>integer</small>&nbsp;
  &nbsp;
                 <input type="number" style="display: none"
-               step="any"               name="seqpedvendaitem"                data-endpoint="POSTapi-v1-site-mercado-itens"
+               step="any"               name="itens.*.seqpedvendaitem"                data-endpoint="POSTapi-v1-site-mercado-itens-batch"
                value="1"
                data-component="body">
     <br>
-<p>Sequência do item no pedido. Example: <code>1</code></p>
-        </div>
-                <div style=" padding-left: 28px;  clear: unset;">
-            <b style="line-height: 2;"><code>codacesso</code></b>&nbsp;&nbsp;
+<p>Sequência do item. Example: <code>1</code></p>
+                    </div>
+                                                                <div style="margin-left: 28px; clear: unset;">
+                        <b style="line-height: 2;"><code>codacesso</code></b>&nbsp;&nbsp;
 <small>string</small>&nbsp;
  &nbsp;
                 <input type="text" style="display: none"
-                              name="codacesso"                data-endpoint="POSTapi-v1-site-mercado-itens"
-               value="COD12345"
+                              name="itens.*.codacesso"                data-endpoint="POSTapi-v1-site-mercado-itens-batch"
+               value="28820"
                data-component="body">
     <br>
-<p>Código de acesso do produto. Example: <code>COD12345</code></p>
-        </div>
-                <div style=" padding-left: 28px;  clear: unset;">
-            <b style="line-height: 2;"><code>seqproduto</code></b>&nbsp;&nbsp;
+<p>Código de acesso. Example: <code>28820</code></p>
+                    </div>
+                                                                <div style="margin-left: 28px; clear: unset;">
+                        <b style="line-height: 2;"><code>seqproduto</code></b>&nbsp;&nbsp;
 <small>integer</small>&nbsp;
  &nbsp;
                 <input type="number" style="display: none"
-               step="any"               name="seqproduto"                data-endpoint="POSTapi-v1-site-mercado-itens"
-               value="12345"
+               step="any"               name="itens.*.seqproduto"                data-endpoint="POSTapi-v1-site-mercado-itens-batch"
+               value="28820"
                data-component="body">
     <br>
-<p>Sequência do produto. Example: <code>12345</code></p>
-        </div>
-                <div style=" padding-left: 28px;  clear: unset;">
-            <b style="line-height: 2;"><code>qtdpedida</code></b>&nbsp;&nbsp;
+<p>Sequência do produto. Example: <code>28820</code></p>
+                    </div>
+                                                                <div style="margin-left: 28px; clear: unset;">
+                        <b style="line-height: 2;"><code>qtdpedida</code></b>&nbsp;&nbsp;
 <small>number</small>&nbsp;
  &nbsp;
                 <input type="number" style="display: none"
-               step="any"               name="qtdpedida"                data-endpoint="POSTapi-v1-site-mercado-itens"
-               value="2.5"
+               step="any"               name="itens.*.qtdpedida"                data-endpoint="POSTapi-v1-site-mercado-itens-batch"
+               value="2"
                data-component="body">
     <br>
-<p>Quantidade pedida. Example: <code>2.5</code></p>
-        </div>
-                <div style=" padding-left: 28px;  clear: unset;">
-            <b style="line-height: 2;"><code>qtdembalagem</code></b>&nbsp;&nbsp;
+<p>Quantidade pedida. Example: <code>2</code></p>
+                    </div>
+                                                                <div style="margin-left: 28px; clear: unset;">
+                        <b style="line-height: 2;"><code>qtdembalagem</code></b>&nbsp;&nbsp;
 <small>number</small>&nbsp;
  &nbsp;
                 <input type="number" style="display: none"
-               step="any"               name="qtdembalagem"                data-endpoint="POSTapi-v1-site-mercado-itens"
+               step="any"               name="itens.*.qtdembalagem"                data-endpoint="POSTapi-v1-site-mercado-itens-batch"
                value="1"
                data-component="body">
     <br>
 <p>Quantidade da embalagem. Example: <code>1</code></p>
-        </div>
-                <div style=" padding-left: 28px;  clear: unset;">
-            <b style="line-height: 2;"><code>vlrembtabpreco</code></b>&nbsp;&nbsp;
+                    </div>
+                                                                <div style="margin-left: 28px; clear: unset;">
+                        <b style="line-height: 2;"><code>vlrembtabpreco</code></b>&nbsp;&nbsp;
 <small>number</small>&nbsp;
  &nbsp;
                 <input type="number" style="display: none"
-               step="any"               name="vlrembtabpreco"                data-endpoint="POSTapi-v1-site-mercado-itens"
-               value="15.9"
+               step="any"               name="itens.*.vlrembtabpreco"                data-endpoint="POSTapi-v1-site-mercado-itens-batch"
+               value="6.99"
                data-component="body">
     <br>
-<p>Valor da embalagem tabela preço. Example: <code>15.9</code></p>
-        </div>
-                <div style=" padding-left: 28px;  clear: unset;">
-            <b style="line-height: 2;"><code>vlrembinformado</code></b>&nbsp;&nbsp;
+<p>Preço unitário. Example: <code>6.99</code></p>
+                    </div>
+                                                                <div style="margin-left: 28px; clear: unset;">
+                        <b style="line-height: 2;"><code>vlrembinformado</code></b>&nbsp;&nbsp;
 <small>number</small>&nbsp;
  &nbsp;
                 <input type="number" style="display: none"
-               step="any"               name="vlrembinformado"                data-endpoint="POSTapi-v1-site-mercado-itens"
-               value="15.9"
+               step="any"               name="itens.*.vlrembinformado"                data-endpoint="POSTapi-v1-site-mercado-itens-batch"
+               value="6.99"
                data-component="body">
     <br>
-<p>Valor da embalagem informado. Example: <code>15.9</code></p>
+<p>Preço informado. Example: <code>6.99</code></p>
+                    </div>
+                                    </details>
+        </div>
+                                        </details>
+        </div>
+        </form>
+
+                    <h2 id="site-mercado-GETapi-v1-site-mercado-pedidos--nropedidoafv-">Consulta o número do pedido de venda gerado pelo ERP a partir do nropedidoafv</h2>
+
+<p>
+</p>
+
+
+
+<span id="example-requests-GETapi-v1-site-mercado-pedidos--nropedidoafv-">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request GET \
+    --get "http://127.0.0.1/api/v1/site-mercado/pedidos/5319" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json"</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://127.0.0.1/api/v1/site-mercado/pedidos/5319"
+);
+
+const headers = {
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+fetch(url, {
+    method: "GET",
+    headers,
+}).then(response =&gt; response.json());</code></pre></div>
+
+</span>
+
+<span id="example-responses-GETapi-v1-site-mercado-pedidos--nropedidoafv-">
+            <blockquote>
+            <p>Example response (200):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;success&quot;: true,
+    &quot;data&quot;: {
+        &quot;nropedidoafv&quot;: &quot;5319&quot;,
+        &quot;nropedvenda&quot;: 234234,
+        &quot;seqedipedvenda&quot;: 12345
+    }
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (404):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;success&quot;: false,
+    &quot;message&quot;: &quot;Pedido n&atilde;o encontrado no ERP&quot;
+}</code>
+ </pre>
+    </span>
+<span id="execution-results-GETapi-v1-site-mercado-pedidos--nropedidoafv-" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-GETapi-v1-site-mercado-pedidos--nropedidoafv-"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-GETapi-v1-site-mercado-pedidos--nropedidoafv-"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-GETapi-v1-site-mercado-pedidos--nropedidoafv-" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-GETapi-v1-site-mercado-pedidos--nropedidoafv-">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-GETapi-v1-site-mercado-pedidos--nropedidoafv-" data-method="GET"
+      data-path="api/v1/site-mercado/pedidos/{nropedidoafv}"
+      data-authed="0"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('GETapi-v1-site-mercado-pedidos--nropedidoafv-', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-GETapi-v1-site-mercado-pedidos--nropedidoafv-"
+                    onclick="tryItOut('GETapi-v1-site-mercado-pedidos--nropedidoafv-');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-GETapi-v1-site-mercado-pedidos--nropedidoafv-"
+                    onclick="cancelTryOut('GETapi-v1-site-mercado-pedidos--nropedidoafv-');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-GETapi-v1-site-mercado-pedidos--nropedidoafv-"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-green">GET</small>
+            <b><code>api/v1/site-mercado/pedidos/{nropedidoafv}</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="GETapi-v1-site-mercado-pedidos--nropedidoafv-"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="GETapi-v1-site-mercado-pedidos--nropedidoafv-"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                        <h4 class="fancy-heading-panel"><b>URL Parameters</b></h4>
+                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>nropedidoafv</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="nropedidoafv"                data-endpoint="GETapi-v1-site-mercado-pedidos--nropedidoafv-"
+               value="5319"
+               data-component="url">
+    <br>
+<p>Número do pedido AFV. Example: <code>5319</code></p>
+            </div>
+                    </form>
+
+                    <h2 id="site-mercado-POSTapi-v1-site-mercado-produtos-categorias">Consulta categorias de produtos pelo codigo_interno</h2>
+
+<p>
+</p>
+
+
+
+<span id="example-requests-POSTapi-v1-site-mercado-produtos-categorias">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request POST \
+    "http://127.0.0.1/api/v1/site-mercado/produtos/categorias" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json" \
+    --data "{
+    \"codigos\": [
+        25973,
+        28820,
+        950
+    ],
+    \"id_loja\": 2
+}"
+</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://127.0.0.1/api/v1/site-mercado/produtos/categorias"
+);
+
+const headers = {
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+let body = {
+    "codigos": [
+        25973,
+        28820,
+        950
+    ],
+    "id_loja": 2
+};
+
+fetch(url, {
+    method: "POST",
+    headers,
+    body: JSON.stringify(body),
+}).then(response =&gt; response.json());</code></pre></div>
+
+</span>
+
+<span id="example-responses-POSTapi-v1-site-mercado-produtos-categorias">
+            <blockquote>
+            <p>Example response (200):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;success&quot;: true,
+    &quot;data&quot;: {
+        &quot;25973&quot;: {
+            &quot;departamento&quot;: &quot;CONSERVAS&quot;,
+            &quot;categoria&quot;: &quot;CONDIMENTOS&quot;,
+            &quot;subcategoria&quot;: &quot;CALDOS&quot;
+        }
+    }
+}</code>
+ </pre>
+    </span>
+<span id="execution-results-POSTapi-v1-site-mercado-produtos-categorias" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-POSTapi-v1-site-mercado-produtos-categorias"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-POSTapi-v1-site-mercado-produtos-categorias"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-POSTapi-v1-site-mercado-produtos-categorias" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-POSTapi-v1-site-mercado-produtos-categorias">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-POSTapi-v1-site-mercado-produtos-categorias" data-method="POST"
+      data-path="api/v1/site-mercado/produtos/categorias"
+      data-authed="0"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('POSTapi-v1-site-mercado-produtos-categorias', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-POSTapi-v1-site-mercado-produtos-categorias"
+                    onclick="tryItOut('POSTapi-v1-site-mercado-produtos-categorias');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-POSTapi-v1-site-mercado-produtos-categorias"
+                    onclick="cancelTryOut('POSTapi-v1-site-mercado-produtos-categorias');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-POSTapi-v1-site-mercado-produtos-categorias"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-black">POST</small>
+            <b><code>api/v1/site-mercado/produtos/categorias</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="POSTapi-v1-site-mercado-produtos-categorias"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="POSTapi-v1-site-mercado-produtos-categorias"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>codigos</code></b>&nbsp;&nbsp;
+<small>string[]</small>&nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="codigos[0]"                data-endpoint="POSTapi-v1-site-mercado-produtos-categorias"
+               data-component="body">
+        <input type="text" style="display: none"
+               name="codigos[1]"                data-endpoint="POSTapi-v1-site-mercado-produtos-categorias"
+               data-component="body">
+    <br>
+<p>Lista de codigos internos.</p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>id_loja</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="id_loja"                data-endpoint="POSTapi-v1-site-mercado-produtos-categorias"
+               value="2"
+               data-component="body">
+    <br>
+<p>ID da loja. Example: <code>2</code></p>
         </div>
         </form>
 

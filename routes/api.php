@@ -44,6 +44,7 @@ Route::prefix('v1')->middleware(['auth.api'])->name('api.v1.')->group(function (
         Route::post('/pedidos', [SiteMercadoController::class, 'inserePedido'])->name('pedidos.store');
         Route::post('/itens/batch', [SiteMercadoController::class, 'insereItensBatch'])->name('itens.store-batch');
         Route::get('/pedidos/{nropedidoafv}', [SiteMercadoController::class, 'consultaPedido'])->name('pedidos.show');
+        Route::post('/produtos/categorias', [SiteMercadoController::class, 'consultaCategorias'])->name('produtos.categorias');
     });
     
     // Cupom Digital - Consulta de cupom fiscal

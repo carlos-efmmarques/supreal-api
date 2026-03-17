@@ -537,7 +537,7 @@ paths:
                 expires_at:
                   type: string
                   description: 'Must be a valid date. Must be a date after <code>now</code>.'
-                  example: '2052-04-07'
+                  example: '2052-04-10'
                   nullable: true
                 ip_restriction:
                   type: string
@@ -617,7 +617,7 @@ paths:
                 expires_at:
                   type: string
                   description: 'Must be a valid date. Must be a date after <code>now</code>.'
-                  example: '2052-04-07'
+                  example: '2052-04-10'
                   nullable: true
                 is_active:
                   type: boolean
@@ -1337,10 +1337,10 @@ paths:
                 - valor
                 - nroparcelas
       security: []
-  /api/v1/site-mercado/itens:
+  /api/v1/site-mercado/itens/batch:
     post:
-      summary: 'Insere itens de um pedido no ERP Oracle usando a procedure sp_insereItensSitemercado'
-      operationId: insereItensDeUmPedidoNoERPOracleUsandoAProcedureSpInsereItensSitemercado
+      summary: 'Insere múltiplos itens de um pedido no ERP em uma única transação'
+      operationId: insereMltiplosItensDeUmPedidoNoERPEmUmanicaTransao
       description: ''
       parameters: []
       responses:
@@ -1352,57 +1352,34 @@ paths:
                 type: object
                 example:
                   success: true
-                  message: 'Item inserido com sucesso no ERP'
+                  message: '48 itens inseridos com sucesso'
                   data:
-                    nropedidoafv: PED123456
-                    seqpedvendaitem: 1
+                    nropedidoafv: '5389'
+                    total_itens: 48
+                    inseridos: 48
+                    erros: 0
                 properties:
                   success:
                     type: boolean
                     example: true
                   message:
                     type: string
-                    example: 'Item inserido com sucesso no ERP'
+                    example: '48 itens inseridos com sucesso'
                   data:
                     type: object
                     properties:
                       nropedidoafv:
                         type: string
-                        example: PED123456
-                      seqpedvendaitem:
+                        example: '5389'
+                      total_itens:
                         type: integer
-                        example: 1
-        422:
-          description: ''
-          content:
-            text/plain:
-              schema:
-                type: string
-                example: '{"success": false, "message": "Erro de validação", "data": {...}}'
-        500:
-          description: ''
-          content:
-            application/json:
-              schema:
-                type: object
-                example:
-                  success: false
-                  message: 'Erro ao inserir item no ERP'
-                  data:
-                    error: ...
-                properties:
-                  success:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                    example: 'Erro ao inserir item no ERP'
-                  data:
-                    type: object
-                    properties:
-                      error:
-                        type: string
-                        example: ...
+                        example: 48
+                      inseridos:
+                        type: integer
+                        example: 48
+                      erros:
+                        type: integer
+                        example: 0
       tags:
         - 'Site Mercado'
       requestBody:
@@ -1414,51 +1391,146 @@ paths:
               properties:
                 nropedidoafv:
                   type: string
-                  description: 'Número do pedido AFV (usado como referência).'
-                  example: PED123456
+                  description: 'Número do pedido AFV.'
+                  example: '5389'
                   nullable: false
-                seqpedvendaitem:
-                  type: integer
-                  description: 'Sequência do item no pedido.'
-                  example: 1
-                  nullable: false
-                codacesso:
-                  type: string
-                  description: 'Código de acesso do produto.'
-                  example: COD12345
-                  nullable: false
-                seqproduto:
-                  type: integer
-                  description: 'Sequência do produto.'
-                  example: 12345
-                  nullable: false
-                qtdpedida:
-                  type: number
-                  description: 'Quantidade pedida.'
-                  example: 2.5
-                  nullable: false
-                qtdembalagem:
-                  type: number
-                  description: 'Quantidade da embalagem.'
-                  example: 1.0
-                  nullable: false
-                vlrembtabpreco:
-                  type: number
-                  description: 'Valor da embalagem tabela preço.'
-                  example: 15.9
-                  nullable: false
-                vlrembinformado:
-                  type: number
-                  description: 'Valor da embalagem informado.'
-                  example: 15.9
-                  nullable: false
+                itens:
+                  type: array
+                  description: 'Array de itens do pedido.'
+                  example:
+                    - architecto
+                  items:
+                    type: string
               required:
                 - nropedidoafv
-                - seqpedvendaitem
-                - codacesso
-                - seqproduto
-                - qtdpedida
-                - qtdembalagem
-                - vlrembtabpreco
-                - vlrembinformado
+                - itens
+      security: []
+  '/api/v1/site-mercado/pedidos/{nropedidoafv}':
+    get:
+      summary: 'Consulta o número do pedido de venda gerado pelo ERP a partir do nropedidoafv'
+      operationId: consultaONmeroDoPedidoDeVendaGeradoPeloERPAPartirDoNropedidoafv
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: true
+                  data:
+                    nropedidoafv: '5319'
+                    nropedvenda: 234234
+                    seqedipedvenda: 12345
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      nropedidoafv:
+                        type: string
+                        example: '5319'
+                      nropedvenda:
+                        type: integer
+                        example: 234234
+                      seqedipedvenda:
+                        type: integer
+                        example: 12345
+        404:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: 'Pedido não encontrado no ERP'
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: 'Pedido não encontrado no ERP'
+      tags:
+        - 'Site Mercado'
+      security: []
+    parameters:
+      -
+        in: path
+        name: nropedidoafv
+        description: 'Número do pedido AFV.'
+        example: '5319'
+        required: true
+        schema:
+          type: string
+  /api/v1/site-mercado/produtos/categorias:
+    post:
+      summary: 'Consulta categorias de produtos pelo codigo_interno'
+      operationId: consultaCategoriasDeProdutosPeloCodigoInterno
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: true
+                  data:
+                    '25973':
+                      departamento: CONSERVAS
+                      categoria: CONDIMENTOS
+                      subcategoria: CALDOS
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      25973:
+                        type: object
+                        properties:
+                          departamento:
+                            type: string
+                            example: CONSERVAS
+                          categoria:
+                            type: string
+                            example: CONDIMENTOS
+                          subcategoria:
+                            type: string
+                            example: CALDOS
+      tags:
+        - 'Site Mercado'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                codigos:
+                  type: array
+                  description: 'Lista de codigos internos.'
+                  example:
+                    - 25973
+                    - 28820
+                    - 950
+                  items:
+                    type: string
+                id_loja:
+                  type: integer
+                  description: 'ID da loja.'
+                  example: 2
+                  nullable: false
+              required:
+                - codigos
+                - id_loja
       security: []
