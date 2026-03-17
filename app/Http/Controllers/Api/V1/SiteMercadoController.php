@@ -299,6 +299,134 @@ class SiteMercadoController extends BaseController
     }
 
     /**
+     * Insere múltiplos itens de um pedido no ERP em uma única transação
+     *
+     * @group Site Mercado
+     * @bodyParam nropedidoafv string required Número do pedido AFV. Example: 5389
+     * @bodyParam itens array required Array de itens do pedido.
+     * @bodyParam itens.*.seqpedvendaitem integer required Sequência do item. Example: 1
+     * @bodyParam itens.*.codacesso string required Código de acesso. Example: 28820
+     * @bodyParam itens.*.seqproduto integer required Sequência do produto. Example: 28820
+     * @bodyParam itens.*.qtdpedida number required Quantidade pedida. Example: 2
+     * @bodyParam itens.*.qtdembalagem number required Quantidade da embalagem. Example: 1
+     * @bodyParam itens.*.vlrembtabpreco number required Preço unitário. Example: 6.99
+     * @bodyParam itens.*.vlrembinformado number required Preço informado. Example: 6.99
+     * @response 201 {"success": true, "message": "48 itens inseridos com sucesso", "data": {"nropedidoafv": "5389", "total_itens": 48, "inseridos": 48, "erros": 0}}
+     */
+    public function insereItensBatch(\Illuminate\Http\Request $request): JsonResponse
+    {
+        try {
+            $request->validate([
+                'nropedidoafv' => 'required|string|max:20',
+                'itens' => 'required|array|min:1',
+                'itens.*.seqpedvendaitem' => 'required|integer|min:1',
+                'itens.*.codacesso' => 'required|string|max:50',
+                'itens.*.seqproduto' => 'required|integer|min:1',
+                'itens.*.qtdpedida' => 'required|numeric|min:0.01',
+                'itens.*.qtdembalagem' => 'required|numeric|min:0.01',
+                'itens.*.vlrembtabpreco' => 'required|numeric|min:0',
+                'itens.*.vlrembinformado' => 'required|numeric|min:0',
+            ]);
+
+            $nropedidoafv = $request->nropedidoafv;
+            $itens = $request->itens;
+
+            Log::info('SiteMercado: Inserção batch de itens', [
+                'nropedidoafv' => $nropedidoafv,
+                'total_itens' => count($itens)
+            ]);
+
+            $sql = "BEGIN
+                consinco.sp_insereItensSitemercado(
+                    p_seqedipedvenda   => :p_seqedipedvenda,
+                    p_seqpedvendaitem  => :p_seqpedvendaitem,
+                    p_codacesso        => :p_codacesso,
+                    p_seqproduto       => :p_seqproduto,
+                    p_qtdpedida        => :p_qtdpedida,
+                    p_qtdembalagem     => :p_qtdembalagem,
+                    p_vlrembtabpreco   => :p_vlrembtabpreco,
+                    p_vlrembinformado  => :p_vlrembinformado
+                );
+            END;";
+
+            $pdo = null;
+            $inseridos = 0;
+            $erros = [];
+
+            try {
+                $pdo = $this->getOraclePdo();
+                $pdo->beginTransaction();
+
+                $stmt = $pdo->prepare($sql);
+
+                foreach ($itens as $item) {
+                    try {
+                        $stmt->execute([
+                            'p_seqedipedvenda' => $nropedidoafv,
+                            'p_seqpedvendaitem' => $item['seqpedvendaitem'],
+                            'p_codacesso' => $item['codacesso'],
+                            'p_seqproduto' => $item['seqproduto'],
+                            'p_qtdpedida' => $item['qtdpedida'],
+                            'p_qtdembalagem' => $item['qtdembalagem'],
+                            'p_vlrembtabpreco' => $item['vlrembtabpreco'],
+                            'p_vlrembinformado' => $item['vlrembinformado'],
+                        ]);
+                        $inseridos++;
+                    } catch (\PDOException $e) {
+                        $erros[] = [
+                            'seqpedvendaitem' => $item['seqpedvendaitem'],
+                            'seqproduto' => $item['seqproduto'],
+                            'error' => $e->getMessage()
+                        ];
+                        Log::warning('SiteMercado: Erro ao inserir item no batch', [
+                            'nropedidoafv' => $nropedidoafv,
+                            'seqpedvendaitem' => $item['seqpedvendaitem'],
+                            'error' => $e->getMessage()
+                        ]);
+                    }
+                }
+
+                // Commit único para todos os itens
+                $pdo->commit();
+
+                Log::info('SiteMercado: Batch de itens finalizado', [
+                    'nropedidoafv' => $nropedidoafv,
+                    'inseridos' => $inseridos,
+                    'erros' => count($erros)
+                ]);
+
+            } catch (\PDOException $e) {
+                if ($pdo) {
+                    $pdo->rollback();
+                }
+                throw new Exception('Erro PDO Oracle no batch: ' . $e->getMessage());
+            }
+
+            $message = "{$inseridos} itens inseridos com sucesso no ERP";
+            if (!empty($erros)) {
+                $message .= " ({$erros} com erro)";
+            }
+
+            return $this->success([
+                'nropedidoafv' => $nropedidoafv,
+                'total_itens' => count($itens),
+                'inseridos' => $inseridos,
+                'erros' => count($erros),
+                'detalhes_erros' => $erros,
+            ], $message, 201);
+
+        } catch (Exception $e) {
+            Log::error('SiteMercado: Erro no batch de itens', [
+                'nropedidoafv' => $request->nropedidoafv ?? 'N/A',
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return $this->serverError('Erro ao inserir itens no ERP: ' . $e->getMessage());
+        }
+    }
+
+    /**
      * Consulta o número do pedido de venda gerado pelo ERP a partir do nropedidoafv
      *
      * @group Site Mercado

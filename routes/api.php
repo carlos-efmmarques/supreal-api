@@ -42,7 +42,7 @@ Route::prefix('v1')->middleware(['auth.api'])->name('api.v1.')->group(function (
     // Site Mercado - APIs para integração com ERP Oracle
     Route::prefix('site-mercado')->name('site-mercado.')->group(function () {
         Route::post('/pedidos', [SiteMercadoController::class, 'inserePedido'])->name('pedidos.store');
-        Route::post('/itens', [SiteMercadoController::class, 'insereItens'])->name('itens.store');
+        Route::post('/itens/batch', [SiteMercadoController::class, 'insereItensBatch'])->name('itens.store-batch');
         Route::get('/pedidos/{nropedidoafv}', [SiteMercadoController::class, 'consultaPedido'])->name('pedidos.show');
     });
     
