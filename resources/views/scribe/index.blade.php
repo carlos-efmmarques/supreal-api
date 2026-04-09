@@ -104,6 +104,19 @@
                             </li>
                                                                         </ul>
                             </ul>
+                    <ul id="tocify-header-etiquetas" class="tocify-header">
+                <li class="tocify-item level-1" data-unique="etiquetas">
+                    <a href="#etiquetas">Etiquetas</a>
+                </li>
+                                    <ul id="tocify-subheader-etiquetas" class="tocify-subheader">
+                                                    <li class="tocify-item level-2" data-unique="etiquetas-POSTapi-v1-etiquetas-imprimir">
+                                <a href="#etiquetas-POSTapi-v1-etiquetas-imprimir">Envia etiquetas para impressão a partir de uma lista de códigos de produto.</a>
+                            </li>
+                                                                                <li class="tocify-item level-2" data-unique="etiquetas-GETapi-v1-etiquetas-impressoras">
+                                <a href="#etiquetas-GETapi-v1-etiquetas-impressoras">Consulta impressoras de etiqueta configuradas para uma empresa.</a>
+                            </li>
+                                                                        </ul>
+                            </ul>
                     <ul id="tocify-header-example" class="tocify-header">
                 <li class="tocify-item level-1" data-unique="example">
                     <a href="#example">Example</a>
@@ -157,7 +170,7 @@
     </ul>
 
     <ul class="toc-footer" id="last-updated">
-        <li>Last updated: March 17, 2026</li>
+        <li>Last updated: April 9, 2026</li>
     </ul>
 </div>
 
@@ -687,7 +700,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
     \"abilities\": [
         \"architecto\"
     ],
-    \"expires_at\": \"2052-04-10\",
+    \"expires_at\": \"2052-05-03\",
     \"ip_restriction\": \"1.102.226.211\",
     \"rate_limit\": 7
 }"
@@ -709,7 +722,7 @@ let body = {
     "abilities": [
         "architecto"
     ],
-    "expires_at": "2052-04-10",
+    "expires_at": "2052-05-03",
     "ip_restriction": "1.102.226.211",
     "rate_limit": 7
 };
@@ -824,10 +837,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <i>optional</i> &nbsp;
                 <input type="text" style="display: none"
                               name="expires_at"                data-endpoint="POSTapi-tokens"
-               value="2052-04-10"
+               value="2052-05-03"
                data-component="body">
     <br>
-<p>Must be a valid date. Must be a date after <code>now</code>. Example: <code>2052-04-10</code></p>
+<p>Must be a valid date. Must be a date after <code>now</code>. Example: <code>2052-05-03</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>ip_restriction</code></b>&nbsp;&nbsp;
@@ -1022,7 +1035,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
     --header "Accept: application/json" \
     --data "{
     \"name\": \"b\",
-    \"expires_at\": \"2052-04-10\",
+    \"expires_at\": \"2052-05-03\",
     \"is_active\": false,
     \"ip_restriction\": \"1.102.226.211\",
     \"rate_limit\": 7
@@ -1042,7 +1055,7 @@ const headers = {
 
 let body = {
     "name": "b",
-    "expires_at": "2052-04-10",
+    "expires_at": "2052-05-03",
     "is_active": false,
     "ip_restriction": "1.102.226.211",
     "rate_limit": 7
@@ -1168,10 +1181,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <i>optional</i> &nbsp;
                 <input type="text" style="display: none"
                               name="expires_at"                data-endpoint="PUTapi-tokens--id-"
-               value="2052-04-10"
+               value="2052-05-03"
                data-component="body">
     <br>
-<p>Must be a valid date. Must be a date after <code>now</code>. Example: <code>2052-04-10</code></p>
+<p>Must be a valid date. Must be a date after <code>now</code>. Example: <code>2052-05-03</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>is_active</code></b>&nbsp;&nbsp;
@@ -1588,6 +1601,327 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <p>The ID of the token. Example: <code>architecto</code></p>
             </div>
                     </form>
+
+                <h1 id="etiquetas">Etiquetas</h1>
+
+    
+
+                                <h2 id="etiquetas-POSTapi-v1-etiquetas-imprimir">Envia etiquetas para impressão a partir de uma lista de códigos de produto.</h2>
+
+<p>
+</p>
+
+<p>Insere na fila MRLX_BASEETIQUETAPROD do Consinco para processamento automático.</p>
+
+<span id="example-requests-POSTapi-v1-etiquetas-imprimir">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request POST \
+    "http://127.0.0.1/api/v1/etiquetas/imprimir" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json" \
+    --data "{
+    \"nroempresa\": 104,
+    \"codigos\": [
+        \"7896045110667\",
+        \"7891234567890\"
+    ]
+}"
+</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://127.0.0.1/api/v1/etiquetas/imprimir"
+);
+
+const headers = {
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+let body = {
+    "nroempresa": 104,
+    "codigos": [
+        "7896045110667",
+        "7891234567890"
+    ]
+};
+
+fetch(url, {
+    method: "POST",
+    headers,
+    body: JSON.stringify(body),
+}).then(response =&gt; response.json());</code></pre></div>
+
+</span>
+
+<span id="example-responses-POSTapi-v1-etiquetas-imprimir">
+</span>
+<span id="execution-results-POSTapi-v1-etiquetas-imprimir" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-POSTapi-v1-etiquetas-imprimir"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-POSTapi-v1-etiquetas-imprimir"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-POSTapi-v1-etiquetas-imprimir" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-POSTapi-v1-etiquetas-imprimir">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-POSTapi-v1-etiquetas-imprimir" data-method="POST"
+      data-path="api/v1/etiquetas/imprimir"
+      data-authed="0"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('POSTapi-v1-etiquetas-imprimir', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-POSTapi-v1-etiquetas-imprimir"
+                    onclick="tryItOut('POSTapi-v1-etiquetas-imprimir');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-POSTapi-v1-etiquetas-imprimir"
+                    onclick="cancelTryOut('POSTapi-v1-etiquetas-imprimir');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-POSTapi-v1-etiquetas-imprimir"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-black">POST</small>
+            <b><code>api/v1/etiquetas/imprimir</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="POSTapi-v1-etiquetas-imprimir"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="POSTapi-v1-etiquetas-imprimir"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>nroempresa</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="nroempresa"                data-endpoint="POSTapi-v1-etiquetas-imprimir"
+               value="104"
+               data-component="body">
+    <br>
+<p>Número da empresa/filial. Example: <code>104</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>codigos</code></b>&nbsp;&nbsp;
+<small>string[]</small>&nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="codigos[0]"                data-endpoint="POSTapi-v1-etiquetas-imprimir"
+               data-component="body">
+        <input type="text" style="display: none"
+               name="codigos[1]"                data-endpoint="POSTapi-v1-etiquetas-imprimir"
+               data-component="body">
+    <br>
+<p>Lista de códigos de barras dos produtos.</p>
+        </div>
+        </form>
+
+                    <h2 id="etiquetas-GETapi-v1-etiquetas-impressoras">Consulta impressoras de etiqueta configuradas para uma empresa.</h2>
+
+<p>
+</p>
+
+
+
+<span id="example-requests-GETapi-v1-etiquetas-impressoras">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request GET \
+    --get "http://127.0.0.1/api/v1/etiquetas/impressoras?nroempresa=104" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json" \
+    --data "{
+    \"nroempresa\": 16
+}"
+</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://127.0.0.1/api/v1/etiquetas/impressoras"
+);
+
+const params = {
+    "nroempresa": "104",
+};
+Object.keys(params)
+    .forEach(key =&gt; url.searchParams.append(key, params[key]));
+
+const headers = {
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+let body = {
+    "nroempresa": 16
+};
+
+fetch(url, {
+    method: "GET",
+    headers,
+    body: JSON.stringify(body),
+}).then(response =&gt; response.json());</code></pre></div>
+
+</span>
+
+<span id="example-responses-GETapi-v1-etiquetas-impressoras">
+            <blockquote>
+            <p>Example response (401):</p>
+        </blockquote>
+                <details class="annotation">
+            <summary style="cursor: pointer;">
+                <small onclick="textContent = parentElement.parentElement.open ? 'Show headers' : 'Hide headers'">Show headers</small>
+            </summary>
+            <pre><code class="language-http">cache-control: no-cache, private
+content-type: application/json
+x-ratelimit-limit: 60
+x-ratelimit-remaining: 59
+vary: Origin
+ </code></pre></details>         <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;success&quot;: false,
+    &quot;message&quot;: &quot;Token de autentica&ccedil;&atilde;o n&atilde;o fornecido&quot;,
+    &quot;data&quot;: null
+}</code>
+ </pre>
+    </span>
+<span id="execution-results-GETapi-v1-etiquetas-impressoras" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-GETapi-v1-etiquetas-impressoras"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-GETapi-v1-etiquetas-impressoras"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-GETapi-v1-etiquetas-impressoras" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-GETapi-v1-etiquetas-impressoras">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-GETapi-v1-etiquetas-impressoras" data-method="GET"
+      data-path="api/v1/etiquetas/impressoras"
+      data-authed="0"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('GETapi-v1-etiquetas-impressoras', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-GETapi-v1-etiquetas-impressoras"
+                    onclick="tryItOut('GETapi-v1-etiquetas-impressoras');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-GETapi-v1-etiquetas-impressoras"
+                    onclick="cancelTryOut('GETapi-v1-etiquetas-impressoras');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-GETapi-v1-etiquetas-impressoras"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-green">GET</small>
+            <b><code>api/v1/etiquetas/impressoras</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="GETapi-v1-etiquetas-impressoras"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="GETapi-v1-etiquetas-impressoras"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                            <h4 class="fancy-heading-panel"><b>Query Parameters</b></h4>
+                                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>nroempresa</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="nroempresa"                data-endpoint="GETapi-v1-etiquetas-impressoras"
+               value="104"
+               data-component="query">
+    <br>
+<p>Número da empresa. Example: <code>104</code></p>
+            </div>
+                        <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>nroempresa</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="nroempresa"                data-endpoint="GETapi-v1-etiquetas-impressoras"
+               value="16"
+               data-component="body">
+    <br>
+<p>Example: <code>16</code></p>
+        </div>
+        </form>
 
                 <h1 id="example">Example</h1>
 

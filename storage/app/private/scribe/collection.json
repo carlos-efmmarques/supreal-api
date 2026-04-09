@@ -10,7 +10,7 @@
     ],
     "info": {
         "name": "Supreal API API Documentation",
-        "_postman_id": "4ddf7d81-ef34-4977-9984-973865a017ba",
+        "_postman_id": "50598299-428f-46da-84f8-cbde11f0bd56",
         "description": "",
         "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
     },
@@ -184,7 +184,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"name\":\"b\",\"abilities\":[\"architecto\"],\"expires_at\":\"2052-04-10\",\"ip_restriction\":\"1.102.226.211\",\"rate_limit\":7}"
+                            "raw": "{\"name\":\"b\",\"abilities\":[\"architecto\"],\"expires_at\":\"2052-05-03\",\"ip_restriction\":\"1.102.226.211\",\"rate_limit\":7}"
                         },
                         "description": "",
                         "auth": {
@@ -287,7 +287,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"name\":\"b\",\"expires_at\":\"2052-04-10\",\"is_active\":false,\"ip_restriction\":\"1.102.226.211\",\"rate_limit\":7}"
+                            "raw": "{\"name\":\"b\",\"expires_at\":\"2052-05-03\",\"is_active\":false,\"ip_restriction\":\"1.102.226.211\",\"rate_limit\":7}"
                         },
                         "description": "",
                         "auth": {
@@ -403,6 +403,109 @@
                         }
                     },
                     "response": []
+                }
+            ]
+        },
+        {
+            "name": "Etiquetas",
+            "description": "",
+            "item": [
+                {
+                    "name": "Envia etiquetas para impress\u00e3o a partir de uma lista de c\u00f3digos de produto.",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/etiquetas\/imprimir",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/etiquetas\/imprimir"
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"nroempresa\":104,\"codigos\":[\"7896045110667\",\"7891234567890\"]}"
+                        },
+                        "description": "Insere na fila MRLX_BASEETIQUETAPROD do Consinco para processamento autom\u00e1tico.",
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Consulta impressoras de etiqueta configuradas para uma empresa.",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/etiquetas\/impressoras",
+                            "query": [
+                                {
+                                    "key": "nroempresa",
+                                    "value": "104",
+                                    "description": "N\u00famero da empresa.",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/api\/v1\/etiquetas\/impressoras?nroempresa=104"
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"nroempresa\":16}"
+                        },
+                        "description": "",
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    },
+                    "response": [
+                        {
+                            "header": [
+                                {
+                                    "key": "cache-control",
+                                    "value": "no-cache, private"
+                                },
+                                {
+                                    "key": "content-type",
+                                    "value": "application\/json"
+                                },
+                                {
+                                    "key": "x-ratelimit-limit",
+                                    "value": "60"
+                                },
+                                {
+                                    "key": "x-ratelimit-remaining",
+                                    "value": "59"
+                                },
+                                {
+                                    "key": "vary",
+                                    "value": "Origin"
+                                }
+                            ],
+                            "code": 401,
+                            "body": "{\"success\":false,\"message\":\"Token de autentica\\u00e7\\u00e3o n\\u00e3o fornecido\",\"data\":null}",
+                            "name": ""
+                        }
+                    ]
                 }
             ]
         },

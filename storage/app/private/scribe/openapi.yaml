@@ -14,6 +14,9 @@ tags:
     name: Endpoints
     description: ''
   -
+    name: Etiquetas
+    description: ''
+  -
     name: Example
     description: ''
   -
@@ -537,7 +540,7 @@ paths:
                 expires_at:
                   type: string
                   description: 'Must be a valid date. Must be a date after <code>now</code>.'
-                  example: '2052-04-10'
+                  example: '2052-05-03'
                   nullable: true
                 ip_restriction:
                   type: string
@@ -617,7 +620,7 @@ paths:
                 expires_at:
                   type: string
                   description: 'Must be a valid date. Must be a date after <code>now</code>.'
-                  example: '2052-04-10'
+                  example: '2052-05-03'
                   nullable: true
                 is_active:
                   type: boolean
@@ -697,6 +700,94 @@ paths:
         required: true
         schema:
           type: string
+  /api/v1/etiquetas/imprimir:
+    post:
+      summary: 'Envia etiquetas para impressão a partir de uma lista de códigos de produto.'
+      operationId: enviaEtiquetasParaImpressoAPartirDeUmaListaDeCdigosDeProduto
+      description: 'Insere na fila MRLX_BASEETIQUETAPROD do Consinco para processamento automático.'
+      parameters: []
+      responses: {  }
+      tags:
+        - Etiquetas
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nroempresa:
+                  type: integer
+                  description: 'Número da empresa/filial.'
+                  example: 104
+                  nullable: false
+                codigos:
+                  type: array
+                  description: 'Lista de códigos de barras dos produtos.'
+                  example:
+                    - '7896045110667'
+                    - '7891234567890'
+                  items:
+                    type: string
+              required:
+                - nroempresa
+                - codigos
+      security: []
+  /api/v1/etiquetas/impressoras:
+    get:
+      summary: 'Consulta impressoras de etiqueta configuradas para uma empresa.'
+      operationId: consultaImpressorasDeEtiquetaConfiguradasParaUmaEmpresa
+      description: ''
+      parameters:
+        -
+          in: query
+          name: nroempresa
+          description: 'Número da empresa.'
+          example: 104
+          required: true
+          schema:
+            type: integer
+            description: 'Número da empresa.'
+            example: 104
+            nullable: false
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  success: false
+                  message: 'Token de autenticação não fornecido'
+                  data: null
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: 'Token de autenticação não fornecido'
+                  data:
+                    type: string
+                    example: null
+      tags:
+        - Etiquetas
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nroempresa:
+                  type: integer
+                  description: ''
+                  example: 16
+                  nullable: false
+              required:
+                - nroempresa
+      security: []
   /api/health:
     get:
       summary: 'Endpoint de teste de saúde da API'
