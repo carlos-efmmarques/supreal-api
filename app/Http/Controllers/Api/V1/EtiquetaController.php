@@ -15,7 +15,6 @@ class EtiquetaController extends BaseController
         $dsn = 'oci:dbname=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=' . env('ORACLE_HOST', '10.36.100.101') . ')(PORT=' . env('ORACLE_PORT', '1521') . '))(CONNECT_DATA=(SERVICE_NAME=' . env('ORACLE_SERVICE_NAME', 'consinco') . ')))';
         $pdo = new \PDO($dsn, env('ORACLE_USERNAME', 'consinco'), env('ORACLE_PASSWORD', 'consinco'));
         $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-        $pdo->setAttribute(\PDO::ATTR_AUTOCOMMIT, false);
         return $pdo;
     }
 
@@ -133,10 +132,10 @@ class EtiquetaController extends BaseController
                     (:nroempresa, :seqproduto, 'G',
                      :codacesso, 'G', :qtdetiqueta,
                      NULL, NULL,
-                     0, 1, :nrosegmento,
+                     1, 1, :nrosegmento,
                      NULL, NULL, NULL,
                      NULL, NULL, NULL,
-                     NULL, :softpdv, 'N',
+                     NULL, :softpdv, 'E',
                      NULL, NULL, 'MAX0588A', :qtdembalagem)
             ");
 
