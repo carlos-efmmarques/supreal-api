@@ -133,10 +133,10 @@ class EtiquetaController extends BaseController
                     (:nroempresa, :seqproduto, 'G',
                      :codacesso, 'G', :qtdetiqueta,
                      NULL, NULL,
-                     1, 1, :nrosegmento,
+                     0, 1, :nrosegmento,
                      NULL, NULL, NULL,
                      NULL, NULL, NULL,
-                     NULL, :softpdv, 'E',
+                     NULL, :softpdv, 'N',
                      NULL, NULL, 'MAX0588A', :qtdembalagem)
             ");
 
