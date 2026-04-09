@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\TokenController;
 use App\Http\Controllers\Api\V1\ExampleController;
 use App\Http\Controllers\Api\V1\SiteMercadoController;
 use App\Http\Controllers\Api\V1\CupomController;
+use App\Http\Controllers\Api\V1\EtiquetaController;
 
 /*
 |--------------------------------------------------------------------------
@@ -50,7 +51,9 @@ Route::prefix('v1')->middleware(['auth.api'])->name('api.v1.')->group(function (
     // Cupom Digital - Consulta de cupom fiscal
     Route::get('/cupom', [CupomController::class, 'show'])->name('cupom.show');
 
-    // Adicione aqui novos grupos de rotas para outros recursos
-    // Route::apiResource('users', UserController::class);
-    // Route::apiResource('products', ProductController::class);
+    // Etiquetas - Impressão de etiquetas via ERP Oracle
+    Route::prefix('etiquetas')->name('etiquetas.')->group(function () {
+        Route::post('/imprimir', [EtiquetaController::class, 'imprimirDivergencias'])->name('imprimir');
+        Route::get('/impressoras', [EtiquetaController::class, 'consultaImpressoras'])->name('impressoras');
+    });
 });
