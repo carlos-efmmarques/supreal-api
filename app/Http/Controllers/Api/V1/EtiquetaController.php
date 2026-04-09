@@ -45,7 +45,6 @@ class EtiquetaController extends BaseController
 
         try {
             $pdo = $this->getOraclePdo();
-            $pdo->beginTransaction();
 
             // 1. Buscar NROSEGMENTO da empresa
             $stmtEmp = $pdo->prepare("
@@ -190,8 +189,6 @@ class EtiquetaController extends BaseController
                 }
             }
 
-            $pdo->commit();
-
             Log::info('[Etiqueta] Impressão concluída', [
                 'nroempresa' => $nroempresa,
                 'inseridos'  => count($inseridos),
@@ -216,10 +213,6 @@ class EtiquetaController extends BaseController
                 'error'      => $e->getMessage(),
                 'trace'      => $e->getTraceAsString(),
             ]);
-
-            if (isset($pdo) && $pdo->inTransaction()) {
-                $pdo->rollBack();
-            }
 
             return $this->serverError('Erro ao processar impressão de etiquetas: ' . $e->getMessage());
         }
