@@ -155,6 +155,18 @@ RUN mkdir -p storage/framework/{cache,sessions,views} \
     && chmod -R 755 /var/www/html \
     && chmod -R 775 storage bootstrap/cache
 
+# PHP-FPM pool sizing — default (max_children=5) satura facil sob carga e nao
+# recupera sem restart. request_terminate_timeout mata worker travado em query
+# lenta, evitando esgotamento permanente do pool.
+RUN sed -i \
+        -e 's/^pm\.max_children = .*/pm.max_children = 30/' \
+        -e 's/^pm\.start_servers = .*/pm.start_servers = 5/' \
+        -e 's/^pm\.min_spare_servers = .*/pm.min_spare_servers = 3/' \
+        -e 's/^pm\.max_spare_servers = .*/pm.max_spare_servers = 10/' \
+        -e 's/^;pm\.max_requests = .*/pm.max_requests = 500/' \
+        -e 's/^;request_terminate_timeout = .*/request_terminate_timeout = 60s/' \
+        /usr/local/etc/php-fpm.d/www.conf
+
 # PHP-FPM config (clear_env = no para herdar LD_LIBRARY_PATH)
 RUN { \
         echo '[www]'; \
