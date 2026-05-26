@@ -10,8 +10,9 @@ use Exception;
 
 class EtiquetaController extends BaseController
 {
-    private const SMB_USER = 'supreal\print.user.real';
-    private const SMB_PASS = 'C87hjk030$%';
+    private const SMB_DOMAIN = 'supreal';
+    private const SMB_USER   = 'print.user.real';
+    private const SMB_PASS   = 'C87hjk030$%';
 
     private function getOracleConnection()
     {
@@ -264,13 +265,11 @@ class EtiquetaController extends BaseController
             $smbPath = ltrim($smbPath, '/');
             $smbPath = '//' . $smbPath;
 
-            $smbUser = self::SMB_USER;
-            $smbPass = self::SMB_PASS;
-
             $cmd = sprintf(
-                "smbclient %s -U %s -c 'print %s' 2>&1",
+                "smbclient %s -U %s -W %s -m SMB2 -c 'print %s' 2>&1",
                 escapeshellarg($smbPath),
-                escapeshellarg("{$smbUser}%{$smbPass}"),
+                escapeshellarg(self::SMB_USER . '%' . self::SMB_PASS),
+                escapeshellarg(self::SMB_DOMAIN),
                 escapeshellarg($tmpFile)
             );
 
