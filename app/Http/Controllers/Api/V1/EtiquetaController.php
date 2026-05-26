@@ -397,4 +397,340 @@ class EtiquetaController extends BaseController
             return $this->serverError('Erro ao consultar impressoras: ' . $e->getMessage());
         }
     }
+
+    /**
+     * Envia etiquetas direto para a impressora ZPL via TCP (porta raw 9100).
+     * Mesmo fluxo Oracle do endpoint /imprimir, mas substitui o SMB+spooler do Windows
+     * por socket TCP direto na Zebra. ~10–1000x mais rápido, sem cold-start de Kerberos.
+     *
+     * Requer que o IP do host SMB (DIRETEXPORTARQUIVO) esteja mapeado em
+     * config/services.php > printing.host_map para o IP da impressora.
+     *
+     * @group Etiquetas
+     * @bodyParam nroempresa integer required Número da empresa/filial. Example: 1
+     * @bodyParam codigos array required Lista de códigos de barras dos produtos. Example: ["7891000100103"]
+     */
+    public function imprimirTcp(Request $request): JsonResponse
+    {
+        $request->validate([
+            'nroempresa' => 'required|integer',
+            'codigos'    => 'required|array|min:1|max:200',
+            'codigos.*'  => 'required|string',
+        ]);
+
+        $nroempresa = $request->nroempresa;
+        $codigos = $request->codigos;
+
+        Log::info('[EtiquetaTCP] Solicitação de impressão', [
+            'nroempresa'  => $nroempresa,
+            'qtd_codigos' => count($codigos),
+            'token'       => $request->api_token->name ?? 'unknown',
+        ]);
+
+        $conn = null;
+
+        try {
+            $conn = $this->getOracleConnection();
+
+            // 1. Buscar segmento da empresa
+            $stmt = oci_parse($conn, "SELECT NROSEGMENTOPRINC FROM MAX_EMPRESA WHERE NROEMPRESA = :nroempresa");
+            oci_bind_by_name($stmt, ':nroempresa', $nroempresa);
+            oci_execute($stmt, OCI_NO_AUTO_COMMIT);
+            $empresa = oci_fetch_assoc($stmt);
+            oci_free_statement($stmt);
+
+            if (!$empresa) {
+                oci_close($conn);
+                return $this->notFound("Empresa $nroempresa não encontrada.");
+            }
+
+            $nrosegmento = $empresa['NROSEGMENTOPRINC'];
+
+            // 2. Buscar configuração da impressora de gôndola
+            $sql = "SELECT A.SOFTPDV, A.NOMEVIEW, A.DIRETEXPORTARQUIVO
+                    FROM MRL_EMPSOFTPDV A
+                    WHERE A.NROEMPRESA = :nroempresa
+                      AND A.TIPOSOFT = 'G'
+                      AND A.STATUS = 'A'
+                      AND NVL(A.INDETIQWEB, 'N') != 'S'";
+            $stmt = oci_parse($conn, $sql);
+            oci_bind_by_name($stmt, ':nroempresa', $nroempresa);
+            oci_execute($stmt, OCI_NO_AUTO_COMMIT);
+            $softpdv = oci_fetch_assoc($stmt);
+            oci_free_statement($stmt);
+
+            if (!$softpdv) {
+                oci_close($conn);
+                return $this->notFound("Nenhuma impressora de gôndola configurada para empresa $nroempresa.");
+            }
+
+            // 3. Mapear host SMB → IP da impressora
+            $printerIp = $this->resolverIpImpressora($softpdv['DIRETEXPORTARQUIVO']);
+
+            if (!$printerIp) {
+                oci_close($conn);
+                Log::warning('[EtiquetaTCP] Host não mapeado em printing.host_map', [
+                    'diretorio' => $softpdv['DIRETEXPORTARQUIVO'],
+                ]);
+                return $this->error(
+                    "Impressora não mapeada para envio TCP. Cadastre o IP da Zebra para o host '{$softpdv['DIRETEXPORTARQUIVO']}' em config/services.php (printing.host_map) ou use o endpoint /imprimir (SMB).",
+                    422
+                );
+            }
+
+            Log::info('[EtiquetaTCP] Impressora resolvida', [
+                'softpdv'     => $softpdv['SOFTPDV'],
+                'nomeview'    => $softpdv['NOMEVIEW'],
+                'diretorio'   => $softpdv['DIRETEXPORTARQUIVO'],
+                'printer_ip'  => $printerIp,
+            ]);
+
+            $inseridos = [];
+            $erros = [];
+
+            // 4. Processar cada código
+            foreach ($codigos as $codigo) {
+                try {
+                    $codigoTrimmed = ltrim(trim($codigo), '0') ?: '0';
+
+                    $sqlProd = "SELECT A.SEQFAMILIA, A.DESCREDUZIDA, A.SEQPRODUTO,
+                                       NVL(QTDETIQUETA, 1) AS QTDETIQUETA, B.QTDEMBALAGEM,
+                                       TO_CHAR(B.CODACESSO) AS CODACESSO
+                                FROM MRLV_BASEETIQUETAPRODCOD A, MAP_PRODCODIGO B, MAP_FAMEMBALAGEM E
+                                WHERE A.SEQPRODUTO = B.SEQPRODUTO
+                                  AND A.QTDEMBALAGEM = B.QTDEMBALAGEM
+                                  AND E.QTDEMBALAGEM = A.QTDEMBALAGEM
+                                  AND E.SEQFAMILIA = A.SEQFAMILIA
+                                  AND B.TIPCODIGO IN ('E', 'D', 'B')
+                                  AND A.STATUSVENDA = 'A'
+                                  AND A.NROSEGMENTO = :nrosegmento
+                                  AND A.NROEMPRESA = :nroempresa
+                                  AND B.CODACESSO = :codacesso
+                                  AND A.QTDEMBALAGEM = (
+                                      SELECT C.QTDEMBALAGEM
+                                      FROM MRL_PRODEMPSEG C
+                                      WHERE C.SEQPRODUTO = A.SEQPRODUTO
+                                        AND C.NROEMPRESA = :nroempresa2
+                                        AND C.NROSEGMENTO = :nrosegmento2
+                                        AND C.STATUSVENDA = 'A'
+                                        AND C.QTDEMBALAGEM = A.QTDEMBALAGEM
+                                  )";
+                    $stmtProd = oci_parse($conn, $sqlProd);
+                    oci_bind_by_name($stmtProd, ':nrosegmento', $nrosegmento);
+                    oci_bind_by_name($stmtProd, ':nroempresa', $nroempresa);
+                    oci_bind_by_name($stmtProd, ':codacesso', $codigoTrimmed);
+                    oci_bind_by_name($stmtProd, ':nroempresa2', $nroempresa);
+                    oci_bind_by_name($stmtProd, ':nrosegmento2', $nrosegmento);
+                    oci_execute($stmtProd, OCI_NO_AUTO_COMMIT);
+                    $produto = oci_fetch_assoc($stmtProd);
+                    oci_free_statement($stmtProd);
+
+                    if (!$produto) {
+                        $erros[] = ['codigo' => $codigo, 'erro' => 'Produto não encontrado'];
+                        continue;
+                    }
+
+                    $sqlIns = "INSERT INTO MRLX_BASEETIQUETAPROD
+                        (NROEMPRESA, SEQPRODUTO, TIPOETIQUETA,
+                         CODACESSO, TIPOPRECO, QTDETIQUETA,
+                         TIPOCODIGO, QTDEMBCODACESSO,
+                         NROETQEMITIDA, NROLINHA, NROSEGMENTO,
+                         LOCALENTRADA, NROEMPPEDSELINVERSA, DESCETIQUETAPROMOC,
+                         DTABASEPRECO, DTAEMBALAMENTO, DIGITOVERIFICADOR,
+                         SIGNETIQELETRONICA, SOFTPDV, INDEMIETIQUETA,
+                         SEQPROMOCPDV, SEQPROMOCESPECIAL, CODAPLICACAO, QTDEMBALAGEMAPLICACAO)
+                    VALUES
+                        (:nroempresa, :seqproduto, 'G',
+                         :codacesso, 'G', :qtdetiqueta,
+                         NULL, NULL,
+                         1, 1, :nrosegmento,
+                         NULL, NULL, NULL,
+                         NULL, NULL, NULL,
+                         NULL, :softpdv, 'E',
+                         NULL, NULL, 'MAX0588A', :qtdembalagem)";
+
+                    $stmtIns = oci_parse($conn, $sqlIns);
+                    $seqProd  = $produto['SEQPRODUTO'];
+                    $codAcc   = $produto['CODACESSO'];
+                    $qtdEtiq  = $produto['QTDETIQUETA'];
+                    $softpdvName = $softpdv['SOFTPDV'];
+                    $qtdEmb   = $produto['QTDEMBALAGEM'];
+                    oci_bind_by_name($stmtIns, ':nroempresa', $nroempresa);
+                    oci_bind_by_name($stmtIns, ':seqproduto', $seqProd);
+                    oci_bind_by_name($stmtIns, ':codacesso', $codAcc);
+                    oci_bind_by_name($stmtIns, ':qtdetiqueta', $qtdEtiq);
+                    oci_bind_by_name($stmtIns, ':nrosegmento', $nrosegmento);
+                    oci_bind_by_name($stmtIns, ':softpdv', $softpdvName);
+                    oci_bind_by_name($stmtIns, ':qtdembalagem', $qtdEmb);
+                    $ok = oci_execute($stmtIns, OCI_NO_AUTO_COMMIT);
+                    oci_free_statement($stmtIns);
+
+                    if (!$ok) {
+                        $e = oci_error($conn);
+                        throw new Exception($e['message'] ?? 'Erro no INSERT');
+                    }
+
+                    $inseridos[] = [
+                        'codigo'     => $codigo,
+                        'produto'    => $produto['DESCREDUZIDA'],
+                        'seqproduto' => $produto['SEQPRODUTO'],
+                    ];
+                } catch (Exception $e) {
+                    $erros[] = ['codigo' => $codigo, 'erro' => $e->getMessage()];
+                    Log::warning('[EtiquetaTCP] Erro ao processar produto', [
+                        'codigo' => $codigo,
+                        'error'  => $e->getMessage(),
+                    ]);
+                }
+            }
+
+            if (empty($inseridos)) {
+                oci_close($conn);
+                return $this->success([
+                    'inseridos' => 0,
+                    'erros'     => count($erros),
+                    'detalhes'  => [],
+                    'falhas'    => $erros,
+                ], 'Nenhum produto encontrado para impressão.');
+            }
+
+            // 5. Ler ZPL da view (mesma sessão — enxerga a tabela temporária)
+            $nomeView = $softpdv['NOMEVIEW'];
+            $stmtView = oci_parse($conn, "SELECT FC_CONCATENA_ESPACO(LINHA, 250, 4000) AS CONTEUDO FROM {$nomeView} WHERE NROEMPRESA = :nroempresa");
+            oci_bind_by_name($stmtView, ':nroempresa', $nroempresa);
+            oci_execute($stmtView, OCI_NO_AUTO_COMMIT);
+
+            $zpl = '';
+            while ($row = oci_fetch_assoc($stmtView)) {
+                $zpl .= rtrim($row['CONTEUDO']) . "\n";
+            }
+            oci_free_statement($stmtView);
+
+            oci_commit($conn);
+            oci_close($conn);
+            $conn = null;
+
+            if ($zpl === '') {
+                Log::warning('[EtiquetaTCP] View retornou conteúdo vazio', [
+                    'nroempresa' => $nroempresa,
+                    'view'       => $nomeView,
+                ]);
+                return $this->error('A view de etiquetas não retornou conteúdo. Verifique a configuração.');
+            }
+
+            // 6. Enviar ZPL via TCP
+            $envio = $this->enviarZplTcp($zpl, $printerIp);
+
+            if (!$envio['ok']) {
+                Log::error('[EtiquetaTCP] Falha no envio TCP', [
+                    'printer_ip' => $printerIp,
+                    'erro'       => $envio['erro'],
+                ]);
+                return $this->error('Etiquetas geradas mas erro ao enviar para impressora: ' . $envio['erro']);
+            }
+
+            Log::info('[EtiquetaTCP] Impressão concluída com sucesso', [
+                'nroempresa'  => $nroempresa,
+                'inseridos'   => count($inseridos),
+                'erros'       => count($erros),
+                'printer_ip'  => $printerIp,
+                'bytes_sent'  => $envio['bytes'],
+                'duration_ms' => $envio['duration_ms'],
+            ]);
+
+            return $this->success([
+                'inseridos'  => count($inseridos),
+                'erros'      => count($erros),
+                'detalhes'   => $inseridos,
+                'falhas'     => $erros,
+                'impressora' => [
+                    'softpdv'     => $softpdv['SOFTPDV'],
+                    'view'        => $nomeView,
+                    'diretorio'   => $softpdv['DIRETEXPORTARQUIVO'],
+                    'printer_ip'  => $printerIp,
+                    'bytes_sent'  => $envio['bytes'],
+                    'duration_ms' => $envio['duration_ms'],
+                ],
+            ], 'Etiquetas enviadas para impressão.');
+
+        } catch (Exception $e) {
+            Log::error('[EtiquetaTCP] Erro geral na impressão', [
+                'nroempresa' => $nroempresa,
+                'error'      => $e->getMessage(),
+                'trace'      => $e->getTraceAsString(),
+            ]);
+
+            if ($conn) {
+                oci_close($conn);
+            }
+
+            return $this->serverError('Erro ao processar impressão de etiquetas: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Extrai o IP do host SMB a partir do DIRETEXPORTARQUIVO e busca no host_map.
+     * Aceita formatos: \\10.36.3.202\Zebra, //10.36.3.202/Zebra, 10.36.3.202.
+     */
+    private function resolverIpImpressora(string $diretorio): ?string
+    {
+        // Normaliza separadores e extrai o primeiro componente não-vazio (o host)
+        $normalizado = trim(str_replace('\\', '/', $diretorio), '/');
+        $host = explode('/', $normalizado)[0] ?? '';
+
+        if ($host === '') {
+            return null;
+        }
+
+        $map = config('services.printing.host_map', []);
+
+        return $map[$host] ?? null;
+    }
+
+    /**
+     * Envia ZPL diretamente para a porta raw (9100) da impressora.
+     * Retorna ['ok' => bool, 'bytes' => int, 'duration_ms' => int, 'erro' => string|null].
+     */
+    private function enviarZplTcp(string $zpl, string $printerIp): array
+    {
+        $tcp = config('services.printing.tcp');
+        $port = $tcp['port'];
+
+        $t0 = microtime(true);
+        $sock = @fsockopen($printerIp, $port, $errno, $errstr, $tcp['connect_timeout']);
+
+        if (!$sock) {
+            return [
+                'ok'          => false,
+                'bytes'       => 0,
+                'duration_ms' => (int) round((microtime(true) - $t0) * 1000),
+                'erro'        => "fsockopen falhou: {$errstr} ({$errno})",
+            ];
+        }
+
+        stream_set_timeout($sock, $tcp['send_timeout']);
+        $bytes = fwrite($sock, $zpl);
+        $meta = stream_get_meta_data($sock);
+        fclose($sock);
+
+        $expected = strlen($zpl);
+
+        if ($bytes === false || $bytes < $expected) {
+            return [
+                'ok'          => false,
+                'bytes'       => (int) $bytes,
+                'duration_ms' => (int) round((microtime(true) - $t0) * 1000),
+                'erro'        => $meta['timed_out']
+                    ? "timeout no envio após {$tcp['send_timeout']}s (enviado {$bytes}/{$expected} bytes)"
+                    : "fwrite incompleto ({$bytes}/{$expected} bytes)",
+            ];
+        }
+
+        return [
+            'ok'          => true,
+            'bytes'       => $bytes,
+            'duration_ms' => (int) round((microtime(true) - $t0) * 1000),
+            'erro'        => null,
+        ];
+    }
 }

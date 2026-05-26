@@ -43,6 +43,16 @@ return [
             'timeout'  => (int) env('SMB_PRINT_TIMEOUT', 10),
             'retries'  => (int) env('SMB_PRINT_RETRIES', 2),
         ],
+        'tcp' => [
+            'port'            => (int) env('PRINT_TCP_PORT', 9100),
+            'connect_timeout' => (int) env('PRINT_TCP_CONNECT_TIMEOUT', 5),
+            'send_timeout'    => (int) env('PRINT_TCP_SEND_TIMEOUT', 10),
+        ],
+        // Mapeamento: IP do host Windows (extraído de DIRETEXPORTARQUIVO) => IP da impressora Zebra
+        // Adicione novas lojas aqui conforme migrar de SMB para TCP direto.
+        'host_map' => [
+            '10.36.3.202' => '10.36.3.46', // Loja 1 (Matriz)
+        ],
     ],
 
 ];
