@@ -35,4 +35,14 @@ return [
         ],
     ],
 
+    'printing' => [
+        'smb' => [
+            'domain'   => env('SMB_PRINT_DOMAIN', 'supreal'),
+            'user'     => env('SMB_PRINT_USER'),
+            'password' => env('SMB_PRINT_PASSWORD'),
+            'timeout'  => (int) env('SMB_PRINT_TIMEOUT', 10),
+            'retries'  => (int) env('SMB_PRINT_RETRIES', 2),
+        ],
+    ],
+
 ];

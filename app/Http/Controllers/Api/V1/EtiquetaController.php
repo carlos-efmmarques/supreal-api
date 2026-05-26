@@ -10,10 +10,6 @@ use Exception;
 
 class EtiquetaController extends BaseController
 {
-    private const SMB_DOMAIN = 'supreal';
-    private const SMB_USER   = 'print.user.real';
-    private const SMB_PASS   = 'C87hjk030$%';
-
     private function getOracleConnection()
     {
         $host = env('ORACLE_HOST', '10.36.100.101');
@@ -260,27 +256,54 @@ class EtiquetaController extends BaseController
             $tmpFile = tempnam(sys_get_temp_dir(), 'etiq_') . '.raw';
             file_put_contents($tmpFile, $conteudoEtiqueta);
 
-            // Converter path Windows para SMB: \\10.36.4.202\elgin → //10.36.4.202/elgin
-            $smbPath = str_replace('\\', '/', $diretorio);
-            $smbPath = ltrim($smbPath, '/');
-            $smbPath = '//' . $smbPath;
+            // Converte path Windows (\\host\share) em URI smbclient (//host/share)
+            $smbPath = '//' . ltrim(str_replace('\\', '/', $diretorio), '/');
 
+            $smb = config('services.printing.smb');
             $cmd = sprintf(
-                "smbclient %s -U %s -W %s -m SMB2 -c 'print %s' 2>&1",
+                'smbclient %s -U %s -W %s -m SMB2 -t %d -c %s 2>&1',
                 escapeshellarg($smbPath),
-                escapeshellarg(self::SMB_USER . '%' . self::SMB_PASS),
-                escapeshellarg(self::SMB_DOMAIN),
-                escapeshellarg($tmpFile)
+                escapeshellarg($smb['user'] . '%' . $smb['password']),
+                escapeshellarg($smb['domain']),
+                $smb['timeout'],
+                escapeshellarg('print ' . $tmpFile)
             );
 
-            $output = shell_exec($cmd);
+            $maxTentativas = 1 + max(0, (int) $smb['retries']);
+            $output = '';
+            $resultCode = 1;
+
+            for ($tentativa = 1; $tentativa <= $maxTentativas; $tentativa++) {
+                $outputLines = [];
+                exec($cmd, $outputLines, $resultCode);
+                $output = implode("\n", $outputLines);
+
+                if ($resultCode === 0) {
+                    if ($tentativa > 1) {
+                        Log::info('[Etiqueta] Impressão bem-sucedida após retry', [
+                            'tentativa' => $tentativa,
+                        ]);
+                    }
+                    break;
+                }
+
+                Log::warning('[Etiqueta] Tentativa de impressão falhou', [
+                    'tentativa'  => $tentativa,
+                    'exit_code'  => $resultCode,
+                    'smb_output' => $output,
+                ]);
+
+                if ($tentativa < $maxTentativas) {
+                    usleep(500_000); // 500ms backoff
+                }
+            }
+
             unlink($tmpFile);
 
-            $impressaoOk = strpos($output, 'putting file') !== false || strpos($output, 'kb/s') !== false;
-
-            if (!$impressaoOk) {
-                Log::error('[Etiqueta] Erro ao enviar para impressora', [
-                    'diretorio' => $diretorio,
+            if ($resultCode !== 0) {
+                Log::error('[Etiqueta] Erro ao enviar para impressora após todas as tentativas', [
+                    'diretorio'  => $diretorio,
+                    'tentativas' => $maxTentativas,
                     'smb_output' => $output,
                 ]);
                 return $this->error('Etiquetas geradas mas erro ao enviar para impressora: ' . trim($output));
