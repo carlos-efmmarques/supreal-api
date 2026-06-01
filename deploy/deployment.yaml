@@ -8,7 +8,10 @@ spec:
   replicas: 2
   strategy:
     type: RollingUpdate
-    rollingUpdate: { maxSurge: 1, maxUnavailable: 0 }
+    # One pod per worker (required anti-affinity below) with only 2 workers means
+    # a surge pod has nowhere to land. Update in place — drop one, replace it on
+    # the freed worker, then the other — instead of surging. Avoids a deadlock.
+    rollingUpdate: { maxSurge: 0, maxUnavailable: 1 }
   selector:
     matchLabels: { app: supreal-api }
   template:
@@ -17,6 +20,14 @@ spec:
     spec:
       imagePullSecrets:
         - name: harbor-pull
+      # HA: never schedule two supreal-api pods on the same node -> exactly one
+      # per worker. With 2 replicas + 2 workers this pins one to each.
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels: { app: supreal-api }
+              topologyKey: kubernetes.io/hostname
       containers:
         - name: supreal-api
           image: harbor.k8s.supreal.com.br/library/supreal-api:bootstrap
