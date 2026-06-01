@@ -16,4 +16,4 @@ resources:
 
 images:
   - name: harbor.k8s.supreal.com.br/library/supreal-api
-    newTag: bootstrap   # CI (jump-01 runner) rewrites this to the commit sha
+    newTag: b2d8317
