@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: supreal-api-config
+  namespace: supreal-api
+# Cluster-specific OVERRIDES. Listed AFTER the sealed .env in envFrom, so these
+# win for duplicate keys — the real MySQL/Oracle/SMB credentials come from the
+# sealed secret; only the environment toggles are overridden here.
+data:
+  APP_ENV: "production"
+  APP_DEBUG: "false"
+  APP_URL: "https://api.k8s.supreal.com.br"
+  APP_TIMEZONE: "America/Sao_Paulo"
+  LOG_CHANNEL: "stderr"
+
+  # Sessions/cache/queue stay on the DB (as in the app's .env) — no Redis needed,
+  # so multiple replicas are safe without shared storage. Kept explicit here.
+  SESSION_DRIVER: "database"
+  CACHE_STORE: "database"
+  QUEUE_CONNECTION: "database"
+
+  # Migrations stay owned by the existing GitLab/.233 pipeline (shared DB).
+  RUN_MIGRATIONS: "false"

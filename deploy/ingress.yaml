@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: supreal-api
+  namespace: supreal-api
+  annotations:
+    cert-manager.io/cluster-issuer: supreal-ca
+    nginx.ingress.kubernetes.io/proxy-body-size: "12m"      # matches PHP post_max_size
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "120"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts: [api.k8s.supreal.com.br]
+      secretName: supreal-api-tls
+  rules:
+    - host: api.k8s.supreal.com.br
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: supreal-api
+                port:
+                  number: 80

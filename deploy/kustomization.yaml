@@ -1,0 +1,19 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: supreal-api
+
+# GitOps for the cluster deploy (api.k8s.supreal.com.br + MetalLB 10.36.100.173),
+# synced by Argo CD. SIDE-BY-SIDE with the existing GitLab/.233 pipeline — this
+# only ADDS the app to k8s and does not touch the original deployment.
+resources:
+  - namespace.yaml
+  - configmap.yaml
+  - sealedsecret-env.yaml
+  - sealedsecret-harbor-pull.yaml
+  - deployment.yaml
+  - service.yaml
+  - ingress.yaml
+
+images:
+  - name: harbor.k8s.supreal.com.br/library/supreal-api
+    newTag: bootstrap   # CI (jump-01 runner) rewrites this to the commit sha

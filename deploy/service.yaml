@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: supreal-api
+  namespace: supreal-api
+  annotations:
+    # Pinned MetalLB address (pool lan-pool 10.36.100.165-199; .165-.172 in use).
+    # Reachable directly at http://10.36.100.173 AND, via the same Service, as
+    # the backend for the api.k8s.supreal.com.br Ingress.
+    metallb.universe.tf/loadBalancerIPs: "10.36.100.173"
+spec:
+  type: LoadBalancer
+  selector: { app: supreal-api }
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80

@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: supreal-api
+  namespace: supreal-api
+  labels: { app: supreal-api }
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate: { maxSurge: 1, maxUnavailable: 0 }
+  selector:
+    matchLabels: { app: supreal-api }
+  template:
+    metadata:
+      labels: { app: supreal-api }
+    spec:
+      imagePullSecrets:
+        - name: harbor-pull
+      containers:
+        - name: supreal-api
+          image: harbor.k8s.supreal.com.br/library/supreal-api:bootstrap
+          ports:
+            - containerPort: 80
+          # envFrom precedence (later wins): real .env creds (sealed) -> cluster
+          # overrides. No Redis/PVC: sessions/cache/queue live in the DB.
+          envFrom:
+            - secretRef:    { name: supreal-api-env }
+            - configMapRef: { name: supreal-api-config }
+          readinessProbe:
+            httpGet: { path: /api/health, port: 80 }
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            failureThreshold: 6
+          livenessProbe:
+            httpGet: { path: /api/health, port: 80 }
+            initialDelaySeconds: 60
+            periodSeconds: 30
+          resources:
+            requests: { cpu: 500m, memory: 512Mi }
+            limits:   { cpu: "2",  memory: 2Gi }
