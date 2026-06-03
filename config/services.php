@@ -49,10 +49,23 @@ return [
             'send_timeout'    => (int) env('PRINT_TCP_SEND_TIMEOUT', 10),
         ],
         // Mapeamento: IP do host Windows (extraído de DIRETEXPORTARQUIVO) => IP da impressora de etiquetas
-        // Adicione novas lojas aqui conforme migrar de SMB para TCP direto.
+        // Usado como fallback quando a empresa não tem catálogo em 'printers' abaixo.
         'host_map' => [
             '10.36.3.202' => '10.36.3.46', // Loja 1 (Matriz)  — Zebra GT800
             '10.36.7.14'  => '10.36.7.33', // Loja 2 (Maravista) — Elgin L42PRO
+        ],
+        // Catálogo de impressoras por empresa (nroempresa => lista).
+        // O app lista esses apelidos pro usuário escolher; o envio TCP usa o 'ip'.
+        // 'default' => true marca a impressora usada quando nenhuma é escolhida.
+        // 'host' é só o IP do CPU/Windows (referência; o TCP usa o 'ip' da impressora).
+        'printers' => [
+            1 => [ // Matriz
+                ['id' => 'matriz_etiquetas', 'alias' => 'Etiquetas', 'ip' => '10.36.3.46', 'host' => '10.36.3.202', 'model' => 'Zebra GT800', 'default' => true],
+            ],
+            2 => [ // Maravista
+                ['id' => 'deposito', 'alias' => 'Conferência / Depósito', 'ip' => '10.36.7.33', 'host' => '10.36.7.14', 'model' => 'Elgin L42PRO', 'default' => true],
+                ['id' => 'frente',   'alias' => 'Frente de Loja',          'ip' => '10.36.7.24', 'host' => '10.36.7.44', 'model' => 'Elgin L42PRO 01'],
+            ],
         ],
     ],
 

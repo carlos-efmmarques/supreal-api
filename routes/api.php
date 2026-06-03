@@ -56,5 +56,6 @@ Route::prefix('v1')->middleware(['auth.api'])->name('api.v1.')->group(function (
         Route::post('/imprimir', [EtiquetaController::class, 'imprimirDivergencias'])->name('imprimir');
         Route::post('/imprimir-tcp', [EtiquetaController::class, 'imprimirTcp'])->name('imprimir-tcp');
         Route::get('/impressoras', [EtiquetaController::class, 'consultaImpressoras'])->name('impressoras');
+        Route::get('/impressoras-disponiveis', [EtiquetaController::class, 'impressorasDisponiveis'])->name('impressoras-disponiveis');
     });
 });

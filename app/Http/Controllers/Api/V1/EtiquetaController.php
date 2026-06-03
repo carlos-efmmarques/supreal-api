@@ -413,18 +413,20 @@ class EtiquetaController extends BaseController
     public function imprimirTcp(Request $request): JsonResponse
     {
         $request->validate([
-            'nroempresa' => 'required|integer',
-            'codigos'    => 'required|array|min:1|max:200',
-            'codigos.*'  => 'required|string',
+            'nroempresa'    => 'required|integer',
+            'codigos'       => 'required|array|min:1|max:200',
+            'codigos.*'     => 'required|string',
+            'impressora_id' => 'nullable|string',
         ]);
 
         $nroempresa = $request->nroempresa;
         $codigos = $request->codigos;
 
         Log::info('[EtiquetaTCP] Solicitação de impressão', [
-            'nroempresa'  => $nroempresa,
-            'qtd_codigos' => count($codigos),
-            'token'       => $request->api_token->name ?? 'unknown',
+            'nroempresa'    => $nroempresa,
+            'qtd_codigos'   => count($codigos),
+            'impressora_id' => $request->input('impressora_id') ?: 'default',
+            'token'         => $request->api_token->name ?? 'unknown',
         ]);
 
         $conn = null;
@@ -464,8 +466,25 @@ class EtiquetaController extends BaseController
                 return $this->notFound("Nenhuma impressora de gôndola configurada para empresa $nroempresa.");
             }
 
-            // 3. Mapear host SMB → IP da impressora
-            $printerIp = $this->resolverIpImpressora($softpdv['DIRETEXPORTARQUIVO']);
+            // 3. Resolver IP da impressora: catálogo (escolha do usuário ou default) → host_map (fallback)
+            $impressoraId = $request->input('impressora_id');
+            $printers = $this->printersForEmpresa((int) $nroempresa);
+            $impressoraAlias = null;
+
+            if ($impressoraId && $impressoraId !== 'default') {
+                $printer = collect($printers)->firstWhere('id', $impressoraId);
+                if (!$printer) {
+                    oci_close($conn);
+                    return $this->error("Impressora '{$impressoraId}' não encontrada para a empresa {$nroempresa}.", 422);
+                }
+                $printerIp = $printer['ip'];
+                $impressoraAlias = $printer['alias'];
+            } else {
+                // Padrão: impressora marcada como default no catálogo; senão host_map (comportamento atual)
+                $default = collect($printers)->firstWhere('default', true) ?? ($printers[0] ?? null);
+                $printerIp = $default['ip'] ?? $this->resolverIpImpressora($softpdv['DIRETEXPORTARQUIVO']);
+                $impressoraAlias = $default['alias'] ?? null;
+            }
 
             if (!$printerIp) {
                 oci_close($conn);
@@ -473,7 +492,7 @@ class EtiquetaController extends BaseController
                     'diretorio' => $softpdv['DIRETEXPORTARQUIVO'],
                 ]);
                 return $this->error(
-                    "Impressora não mapeada para envio TCP. Cadastre o IP da Zebra para o host '{$softpdv['DIRETEXPORTARQUIVO']}' em config/services.php (printing.host_map) ou use o endpoint /imprimir (SMB).",
+                    "Impressora não mapeada para envio TCP. Cadastre a impressora da empresa em config/services.php (printing.printers) ou o host em printing.host_map.",
                     422
                 );
             }
@@ -482,6 +501,8 @@ class EtiquetaController extends BaseController
                 'softpdv'     => $softpdv['SOFTPDV'],
                 'nomeview'    => $softpdv['NOMEVIEW'],
                 'diretorio'   => $softpdv['DIRETEXPORTARQUIVO'],
+                'impressora'  => $impressoraId ?: 'default',
+                'alias'       => $impressoraAlias,
                 'printer_ip'  => $printerIp,
             ]);
 
@@ -685,6 +706,53 @@ class EtiquetaController extends BaseController
         $map = config('services.printing.host_map', []);
 
         return $map[$host] ?? null;
+    }
+
+    /**
+     * Catálogo de impressoras físicas configuradas para uma empresa.
+     */
+    private function printersForEmpresa(int $nroempresa): array
+    {
+        $all = config('services.printing.printers', []);
+
+        return $all[$nroempresa] ?? [];
+    }
+
+    /**
+     * Lista as impressoras disponíveis para a empresa (apelido/modelo), para o
+     * usuário escolher no app. Não expõe IPs. Empresas sem catálogo retornam a
+     * opção única "Padrão" (resolução por host_map no momento do envio).
+     *
+     * @group Etiquetas
+     * @queryParam nroempresa integer required Número da empresa/filial. Example: 2
+     */
+    public function impressorasDisponiveis(Request $request): JsonResponse
+    {
+        $request->validate([
+            'nroempresa' => 'required|integer',
+        ]);
+
+        $printers = $this->printersForEmpresa((int) $request->nroempresa);
+
+        if (empty($printers)) {
+            $printers = [[
+                'id'      => 'default',
+                'alias'   => 'Padrão',
+                'model'   => null,
+                'default' => true,
+            ]];
+        }
+
+        $lista = array_map(function ($p) {
+            return [
+                'id'      => $p['id'],
+                'alias'   => $p['alias'],
+                'model'   => $p['model'] ?? null,
+                'default' => (bool) ($p['default'] ?? false),
+            ];
+        }, $printers);
+
+        return $this->success($lista, 'Impressoras disponíveis.');
     }
 
     /**
