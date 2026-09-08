@@ -54,6 +54,8 @@ return [
             '10.36.3.202' => '10.36.3.46', // Loja 1 (Matriz)  — Zebra GT800
             '10.36.7.14'  => '10.36.7.33', // Loja 2 (Maravista) — Elgin L42PRO
             '10.36.6.65'  => '10.36.6.24', // Loja 3 (Noronha)   — Zebra GT800
+            '10.36.9.69'  => '10.36.9.86', // Loja 109 (São Francisco) — Elgin L42PRO Full
+            '10.36.4.202' => '10.36.4.53', // Loja 104 (Itacoatiara)   — Elgin L42PRO Full
         ],
         // Catálogo de impressoras por empresa (nroempresa => lista).
         // O app lista esses apelidos pro usuário escolher; o envio TCP usa o 'ip'.
@@ -69,6 +71,12 @@ return [
             ],
             3 => [ // Noronha
                 ['id' => 'noronha_etiquetas', 'alias' => 'Etiquetas', 'ip' => '10.36.6.24', 'host' => '10.36.6.65', 'model' => 'Zebra GT800', 'default' => true],
+            ],
+            104 => [ // Itacoatiara
+                ['id' => 'itacoatiara_etiquetas', 'alias' => 'Etiquetas', 'ip' => '10.36.4.53', 'host' => '10.36.4.202', 'model' => 'Elgin L42PRO Full', 'default' => true],
+            ],
+            109 => [ // São Francisco
+                ['id' => 'sao_francisco_etiquetas', 'alias' => 'Etiquetas', 'ip' => '10.36.9.86', 'host' => '10.36.9.69', 'model' => 'Elgin L42PRO Full', 'default' => true],
             ],
         ],
     ],
