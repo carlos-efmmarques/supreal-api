@@ -8,7 +8,8 @@ name: Build & Push k8s (Harbor)
 # The tag-bump commit is mirrored to the GitLab remote so both remotes keep the
 # same main; otherwise a local `git push` (which targets both) is rejected on
 # GitHub as non-fast-forward. Requires the GITLAB_SSH_KEY secret: a GitLab
-# deploy key for this project with write access.
+# deploy key for this project with write access, stored base64-encoded (a raw
+# PEM also works, but pasting one tends to mangle its line breaks).
 
 on:
   workflow_dispatch: {}
@@ -86,9 +87,24 @@ jobs:
           # Keep the key off the shared self-hosted runner's ~/.ssh.
           KEYDIR="$(mktemp -d)"
           trap 'rm -rf "$KEYDIR"' EXIT
-          printf '%s\n' "$GITLAB_SSH_KEY" > "$KEYDIR/id"
+          umask 077
+          # Accept the secret either base64-encoded (preferred: survives copy/paste
+          # intact) or as a raw PEM, and strip any CR the paste may have introduced.
+          if printf '%s' "$GITLAB_SSH_KEY" | grep -q 'PRIVATE KEY'; then
+            printf '%s\n' "$GITLAB_SSH_KEY" | tr -d '\r' > "$KEYDIR/id"
+          else
+            printf '%s' "$GITLAB_SSH_KEY" | tr -d '\r\n' | base64 -d > "$KEYDIR/id"
+          fi
           chmod 600 "$KEYDIR/id"
-          ssh-keyscan -H gitlab.supermercadosreal.com.br > "$KEYDIR/known_hosts" 2>/dev/null
+          if ! ssh-keygen -y -f "$KEYDIR/id" > /dev/null 2>&1; then
+            echo "::error::GITLAB_SSH_KEY is not a usable private key (mangled line breaks, truncated, or passphrase-protected). Re-add it with: base64 < deploy_key | pbcopy"
+            exit 1
+          fi
+          if ! ssh-keyscan -H gitlab.supermercadosreal.com.br > "$KEYDIR/known_hosts" 2>"$KEYDIR/keyscan.err"; then
+            echo "::error::ssh-keyscan could not reach the GitLab host from this runner:"
+            cat "$KEYDIR/keyscan.err"
+            exit 1
+          fi
           GIT_SSH_COMMAND="ssh -i $KEYDIR/id -o IdentitiesOnly=yes -o UserKnownHostsFile=$KEYDIR/known_hosts" \
             git push "$GITLAB_REMOTE" HEAD:main
 
