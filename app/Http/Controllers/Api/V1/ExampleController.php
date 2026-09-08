@@ -136,6 +136,8 @@ class ExampleController extends BaseController
      */
     public function health(): JsonResponse
     {
+        // Smoke-test target: touching this file exercises the k8s build/deploy
+        // pipeline end to end (Harbor image -> tag bump -> Argo CD sync).
         return $this->success([
             'status' => 'healthy',
             'timestamp' => now()->toDateTimeString(),
