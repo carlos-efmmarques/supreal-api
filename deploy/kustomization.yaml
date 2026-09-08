@@ -16,4 +16,4 @@ resources:
 
 images:
   - name: harbor.k8s.supreal.com.br/library/supreal-api
-    newTag: 3cd5612
+    newTag: a57fbeb
